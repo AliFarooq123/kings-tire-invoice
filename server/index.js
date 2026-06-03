@@ -108,8 +108,8 @@ app.get('/invoices/search', async (req, res) => {
        OR license_plate ILIKE $1 
        OR vin ILIKE $1
        OR phone ILIKE $1
-       OR ard_number::text ILIKE $1
-       OR ('ARD' || LPAD(ard_number::text, 8, '0')) ILIKE $1
+       OR (ard_number IS NOT NULL AND ard_number::text ILIKE $1)
+       OR (ard_number IS NOT NULL AND ('ARD' || LPAD(ard_number::text, 8, '0')) ILIKE $1)
        ORDER BY created_at DESC`,
       [`%${q}%`]
     );

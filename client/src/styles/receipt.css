@@ -174,14 +174,23 @@
   letter-spacing: 0.05em;
 }
 
-.receipt-invoice-num {
-  border: 1px solid #000;
-  padding: 0.04in 0.08in;
-  font-size: 8pt;
+.receipt-ard-box {
+  border: 2px solid #000;
+  padding: 0.08in 0.1in;
+  font-size: 11pt;
   font-weight: bold;
-  margin-top: 0.04in;
-  min-width: 1.2in;
+  margin-top: 0.06in;
+  min-width: 1.65in;
+  min-height: 0.38in;
   text-align: center;
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.receipt-ard-box:empty::before {
+  content: '\00a0';
 }
 
 /* Customer banner */
@@ -257,15 +266,15 @@
   border-bottom-color: #000;
 }
 
-/* Payment row */
-.receipt-payment {
+/* Payment row + mileage */
+.receipt-payment-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, 1fr) minmax(1.1in, auto);
   border: 1px solid #000;
   border-top: none;
 }
 
-.receipt-payment label {
+.receipt-payment-row .payment-option {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -275,10 +284,43 @@
   font-weight: bold;
   font-size: 8pt;
   cursor: pointer;
+  margin: 0;
 }
 
-.receipt-payment label:last-child {
-  border-right: none;
+.receipt-mileage-cell {
+  display: flex;
+  align-items: baseline;
+  gap: 0.04in;
+  padding: 0.04in 0.06in;
+  font-size: 8pt;
+  border-left: 1px solid #000;
+}
+
+.receipt-mileage-cell label {
+  font-weight: bold;
+  font-size: 7pt;
+  white-space: nowrap;
+}
+
+.receipt-mileage-cell input {
+  flex: 1;
+  min-width: 0.5in;
+  border: none;
+  border-bottom: 1px solid #ccc;
+  font-size: 9pt;
+  font-family: inherit;
+  padding: 0;
+  background: transparent;
+}
+
+.receipt-mileage-cell input:focus {
+  outline: none;
+  border-bottom-color: #000;
+}
+
+.receipt-mileage-cell .field-value {
+  flex: 1;
+  font-size: 9pt;
 }
 
 /* Line items table */
@@ -452,9 +494,24 @@
 
 .total-row .total-value {
   text-align: right;
-  padding: 0.02in 0.06in;
+  padding: 0;
   font-size: 8.5pt;
-  min-width: 0.85in;
+  min-width: 0.95in;
+}
+
+.total-row .total-value .amount-split {
+  height: 100%;
+  min-height: 0.2in;
+}
+
+.total-row .total-value .amount-dollars {
+  padding: 0.02in 0.04in 0.02in 0.02in;
+}
+
+.total-row .total-value .amount-cents-divider {
+  width: 0.32in;
+  padding: 0.02in 0.03in;
+  font-size: 8pt;
 }
 
 .total-row input.total-input {
@@ -526,10 +583,22 @@
   padding: 0.04in;
 }
 
+.receipt-footer-signature {
+  grid-column: 1 / -1;
+}
+
+.receipt-footer-signature .sig-label {
+  font-size: 7pt;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 0.04in;
+}
+
 .receipt-footer .sig-line {
-  border-bottom: 1px solid #000;
-  margin-top: 0.12in;
-  min-height: 0.2in;
+  border-bottom: 2px solid #000;
+  margin-top: 0.04in;
+  min-height: 0.45in;
+  width: 100%;
 }
 
 .receipt-item-controls {
@@ -595,9 +664,17 @@
     outline: none !important;
   }
 
-  .receipt-payment input[type='checkbox'] {
+  .receipt-payment-row input[type='checkbox'] {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+  }
+
+  .receipt-ard-box {
+    border-width: 2px;
+  }
+
+  .receipt-footer .sig-line {
+    min-height: 0.5in;
   }
 }
 

@@ -1,7 +1,7 @@
 import kingsLogo from '../assets/kings-logo.svg';
 import {
   formatMoney,
-  formatInvoiceId,
+  formatArdNumber,
   lineTotal,
 } from '../utils/calculations';
 
@@ -60,14 +60,14 @@ function CheckboxField({ mode, checked, onChange, label, children }) {
 function PaymentOption({ mode, label, field, data, onPaymentChange }) {
   if (mode === 'view') {
     return (
-      <label>
+      <label className="payment-option">
         <span className={`view-checkbox ${data[field] ? 'checked' : ''}`} />
         {label}
       </label>
     );
   }
   return (
-    <label>
+    <label className="payment-option">
       <input
         type="checkbox"
         checked={!!data[field]}
@@ -94,7 +94,7 @@ export default function ReceiptLayout({
   mode = 'view',
   data,
   items = [],
-  invoiceId,
+  ardNumber,
   onChange,
   onItemChange,
   onPaymentChange,
@@ -106,6 +106,7 @@ export default function ReceiptLayout({
       : Array.from({ length: 10 }, () => ({ qty: '', description: '', amount: '' }));
 
   const handleField = (field) => (val) => onChange?.(field, val);
+  const displayArd = formatArdNumber(ardNumber ?? data?.ard_number);
 
   const renderTotalRow = (label, field, editable = false) => (
     <div className={`total-row ${!editable ? 'total-readonly' : ''}`}>
@@ -120,7 +121,9 @@ export default function ReceiptLayout({
           onChange={(e) => onChange(field, e.target.value)}
         />
       ) : (
-        <span className="total-value">{formatMoney(data[field])}</span>
+        <div className="total-value">
+          <AmountDisplay value={data[field]} mode="view" />
+        </div>
       )}
     </div>
   );
@@ -140,9 +143,9 @@ export default function ReceiptLayout({
         </div>
         <div className="receipt-invoice-label">
           <h2>INVOICE</h2>
-          {invoiceId != null && (
-            <div className="receipt-invoice-num">{formatInvoiceId(invoiceId)}</div>
-          )}
+          <div className="receipt-ard-box" aria-label="ARD number">
+            {displayArd}
+          </div>
         </div>
       </header>
 
@@ -218,12 +221,9 @@ export default function ReceiptLayout({
             onChange={handleField('license_plate')}
           />
         </Cell>
-        <Cell label="Mileage:">
-          <FieldInput mode={mode} value={data.mileage} onChange={handleField('mileage')} />
-        </Cell>
       </div>
 
-      <div className="receipt-payment">
+      <div className="receipt-payment-row">
         <PaymentOption
           mode={mode}
           label="CASH"
@@ -252,6 +252,10 @@ export default function ReceiptLayout({
           data={data}
           onPaymentChange={onPaymentChange}
         />
+        <div className="receipt-mileage-cell">
+          <label>Mileage:</label>
+          <FieldInput mode={mode} value={data.mileage} onChange={handleField('mileage')} />
+        </div>
       </div>
 
       <table className="receipt-items-table">
@@ -469,11 +473,11 @@ export default function ReceiptLayout({
       <div className="receipt-no-returns">{NO_RETURNS}</div>
 
       <div className="receipt-footer">
-        <div>
-          <strong>CUSTOMER SIGNATURE</strong>
-          <div className="sig-line" />
+        <div className="receipt-footer-signature">
+          <span className="sig-label">CUSTOMER SIGNATURE</span>
+          <div className="sig-line" aria-hidden="true" />
         </div>
-        <div style={{ textAlign: 'right', paddingTop: '0.08in' }}>
+        <div style={{ textAlign: 'right', paddingTop: '0.2in' }}>
           Kings Tire Wheels &amp; Auto Repair will not be responsible for any item left over 3
           days.
         </div>

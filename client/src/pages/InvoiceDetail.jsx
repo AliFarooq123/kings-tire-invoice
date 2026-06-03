@@ -72,7 +72,12 @@ function InvoiceDetailContent({ id, shouldPrint }) {
         </button>
       </div>
 
-      <ReceiptLayout mode="view" data={data} items={items} invoiceId={id} />
+      <ReceiptLayout
+        mode="view"
+        data={data}
+        items={items}
+        ardNumber={data.ard_number}
+      />
     </div>
   );
 }

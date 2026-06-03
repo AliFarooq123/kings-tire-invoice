@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { searchInvoices } from '../api/invoices';
-import { formatMoney } from '../utils/calculations';
+import { formatMoney, formatArdNumber } from '../utils/calculations';
 
 function formatDate(row) {
   if (row.date) return row.date;
@@ -59,7 +59,7 @@ export default function Search() {
       <form className="search-form no-print" onSubmit={handleSubmit}>
         <input
           type="search"
-          placeholder="Name, phone, license plate, or VIN…"
+          placeholder="Name, phone, plate, VIN, or ARD number…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
@@ -81,6 +81,9 @@ export default function Search() {
           <li key={row.id} onClick={() => navigate(`/invoices/${row.id}`)}>
             <strong>{row.customer_name || 'Unknown'}</strong>
             <div className="result-meta">
+              {row.ard_number != null && (
+                <span>{formatArdNumber(row.ard_number)} · </span>
+              )}
               {formatDate(row)} · {vehicleLabel(row)}
               {row.license_plate ? ` · ${row.license_plate}` : ''} · $
               {formatMoney(row.total)}
