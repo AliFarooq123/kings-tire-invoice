@@ -10,6 +10,17 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
+async function ensureSchema() {
+  await pool.query(`
+    ALTER TABLE invoices
+    ADD COLUMN IF NOT EXISTS ard_number SERIAL UNIQUE
+  `);
+}
+
+ensureSchema().catch((err) => {
+  console.error('Schema check failed (is DATABASE_URL set?):', err.message);
+});
+
 app.use(cors());
 app.use(express.json());
 
@@ -54,7 +65,7 @@ app.post('/invoices', async (req, res) => {
         $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,
         $18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,
         $33,$34,$35,$36,$37,$38,$39,$40,$41,$42
-      ) RETURNING id`,
+      ) RETURNING id, ard_number`,
       [
         customer_name, phone, address, city, state, zip, date,
         vehicle_year, vehicle_make, vehicle_model, license_plate, vin, mileage,
@@ -71,7 +82,7 @@ app.post('/invoices', async (req, res) => {
       ]
     );
 
-    const invoiceId = invoiceResult.rows[0].id;
+    const { id: invoiceId, ard_number: ardNumber } = invoiceResult.rows[0];
 
     for (const item of items) {
       await pool.query(
@@ -80,7 +91,7 @@ app.post('/invoices', async (req, res) => {
       );
     }
 
-    res.json({ success: true, id: invoiceId });
+    res.json({ success: true, id: invoiceId, ard_number: ardNumber });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to save invoice' });
@@ -97,6 +108,8 @@ app.get('/invoices/search', async (req, res) => {
        OR license_plate ILIKE $1 
        OR vin ILIKE $1
        OR phone ILIKE $1
+       OR ard_number::text ILIKE $1
+       OR ('ARD' || LPAD(ard_number::text, 8, '0')) ILIKE $1
        ORDER BY created_at DESC`,
       [`%${q}%`]
     );

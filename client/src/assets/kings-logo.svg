@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 90" width="80" height="90">
+  <path fill="#000" d="M40 4 L48 28 L72 28 L52 42 L60 66 L40 52 L20 66 L28 42 L8 28 L32 28 Z"/>
+  <rect x="12" y="68" width="56" height="18" rx="2" fill="#000"/>
+  <text x="40" y="81" text-anchor="middle" fill="#fff" font-family="Georgia, serif" font-size="11" font-weight="bold">King's</text>
+</svg>
