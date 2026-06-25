@@ -1,5 +1,7 @@
 import { getToken, clearToken } from '../auth/storage';
 
+const base = import.meta.env.VITE_API_URL ?? '';
+
 function authHeaders(extra = {}) {
   const token = getToken();
   return {
@@ -24,7 +26,7 @@ async function handleResponse(res, fallbackMessage) {
 }
 
 export async function saveInvoice(payload) {
-  const res = await fetch('/invoices', {
+  const res = await fetch(`${base}/invoices`, {
     method: 'POST',
     headers: authHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(payload),
@@ -33,7 +35,7 @@ export async function saveInvoice(payload) {
 }
 
 export async function updateInvoice(id, payload) {
-  const res = await fetch(`/invoices/${id}`, {
+  const res = await fetch(`${base}/invoices/${id}`, {
     method: 'PUT',
     headers: authHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(payload),
@@ -46,21 +48,21 @@ export async function searchInvoices({ q = '', startDate = '', endDate = '' } = 
   if (q.trim()) params.set('q', q.trim());
   if (startDate) params.set('start_date', startDate);
   if (endDate) params.set('end_date', endDate);
-  const res = await fetch(`/invoices/search?${params.toString()}`, {
+  const res = await fetch(`${base}/invoices/search?${params.toString()}`, {
     headers: authHeaders(),
   });
   return handleResponse(res, 'Search failed');
 }
 
 export async function getInvoice(id) {
-  const res = await fetch(`/invoices/${id}`, {
+  const res = await fetch(`${base}/invoices/${id}`, {
     headers: authHeaders(),
   });
   return handleResponse(res, 'Failed to get invoice');
 }
 
 export async function deleteInvoice(id) {
-  const res = await fetch(`/invoices/${id}`, {
+  const res = await fetch(`${base}/invoices/${id}`, {
     method: 'DELETE',
     headers: authHeaders(),
   });
