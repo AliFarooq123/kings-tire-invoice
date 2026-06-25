@@ -478,8 +478,7 @@ export default function ReceiptLayout({
           <div className="sig-line" aria-hidden="true" />
         </div>
         <div style={{ textAlign: 'right', paddingTop: '0.2in' }}>
-          Kings Tire Wheels &amp; Auto Repair will not be responsible for any item left over 3
-          days.
+          Kings Tire Wheels &amp; Auto Repair will not be responsible for any item left over 3 days.
         </div>
       </div>
     </div>

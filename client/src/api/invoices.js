@@ -28,3 +28,10 @@ export async function getInvoice(id) {
   }
   return res.json();
 }
+export async function deleteInvoice(id) {
+  const res = await fetch(`/invoices/${id}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) throw new Error('Delete failed');
+  return res.json();
+}
