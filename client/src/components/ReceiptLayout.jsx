@@ -3,9 +3,10 @@ import DateField from './DateField';
 import { MIN_LINE_ROWS } from '../constants/receipt';
 import {
   formatMoney,
-  formatArdNumber,
   lineTotal,
 } from '../utils/calculations';
+
+const STATIC_ARD = 'ARD00289317';
 import { padLineItems } from '../hooks/useInvoiceForm';
 
 const LEGAL_TEXT = `CUSTOMERS: PLEASE NOTE: NOT RESPONSIBLE FOR BROKEN OR LOST HUB CAPS, VALVE STEM CAPS, ANTENNAS, OR ANY OTHER PARTS LEFT IN OR ON VEHICLE. NOT RESPONSIBLE FOR ANY DAMAGES TO VEHICLE AFTER IT HAS LEFT THE SHOP. NOT RESPONSIBLE FOR DAMAGES CAUSED BY IMPROPER INSTALLATION OF CUSTOMER SUPPLIED PARTS. WARRANTY ON PARTS AND LABOR AS STATED ABOVE ONLY. ALL WARRANTIES VOID IF VEHICLE IS TOWED, JUMPED, OR WORKED ON BY ANOTHER SHOP. CUSTOMER IS RESPONSIBLE FOR PAYMENT IN FULL. MECHANIC'S LIEN MAY BE ENFORCED FOR NON-PAYMENT.`;
@@ -111,7 +112,7 @@ export default function ReceiptLayout({
   );
 
   const handleField = (field) => (val) => onChange?.(field, val);
-  const displayArd = formatArdNumber(ardNumber ?? data?.ard_number);
+  const counterNumber = ardNumber ?? data?.ard_number;
 
   const renderTotalRow = (label, field) => (
     <div className="total-row">
@@ -137,6 +138,9 @@ export default function ReceiptLayout({
       <header className="receipt-header">
         <div className="receipt-logo">
           <img src={kingsLogo} alt="King's Tire" />
+          {counterNumber != null && (
+            <span className="receipt-counter">#{counterNumber}</span>
+          )}
         </div>
         <div className="receipt-shop-block">
           <h1 className="receipt-shop-title">TIRE WHEELS &amp; AUTO REPAIR</h1>
@@ -148,7 +152,7 @@ export default function ReceiptLayout({
         <div className="receipt-invoice-label">
           <h2>INVOICE</h2>
           <div className="receipt-ard-box" aria-label="ARD number">
-            {displayArd}
+            {STATIC_ARD}
           </div>
         </div>
       </header>
@@ -324,6 +328,7 @@ export default function ReceiptLayout({
       </div>
 
       <div className="receipt-bottom">
+        <div className="receipt-bottom-left">
         <div className="receipt-specials">
           <h3>SPECIAL ORDER: NO REFUNDS AND NO EXCHANGE</h3>
 
@@ -433,6 +438,37 @@ export default function ReceiptLayout({
           </div>
         </div>
 
+        <div className="receipt-legal">{LEGAL_TEXT}</div>
+
+        <div className="receipt-initials-block">
+          <div className="init-line">
+            <span>Customer has inspected the car prior to leaving - Initial:</span>
+            {isEdit ? (
+              <input
+                value={data.customer_inspected_initial ?? ''}
+                onChange={(e) => onChange('customer_inspected_initial', e.target.value)}
+              />
+            ) : (
+              <span>{data.customer_inspected_initial || '________'}</span>
+            )}
+          </div>
+          <div className="init-line">
+            <span>
+              I have read all information above carefully. Kings Tire Wheels &amp; Auto Repair is
+              not liable for any damages incurred after vehicle has left the shop - Initial:
+            </span>
+            {isEdit ? (
+              <input
+                value={data.customer_read_initial ?? ''}
+                onChange={(e) => onChange('customer_read_initial', e.target.value)}
+              />
+            ) : (
+              <span>{data.customer_read_initial || '________'}</span>
+            )}
+          </div>
+        </div>
+        </div>
+
         <div className="receipt-totals">
           {renderTotalRow('LABOR', 'labor')}
           {renderTotalRow('SUB TOTAL', 'subtotal')}
@@ -442,36 +478,6 @@ export default function ReceiptLayout({
           {renderTotalRow('TOTAL', 'total')}
           {renderTotalRow('DEPOSIT', 'deposit')}
           {renderTotalRow('BALANCE DUE', 'balance_due')}
-        </div>
-      </div>
-
-      <div className="receipt-legal">{LEGAL_TEXT}</div>
-
-      <div className="receipt-initials-block">
-        <div className="init-line">
-          <span>Customer has inspected the car prior to leaving - Initial:</span>
-          {isEdit ? (
-            <input
-              value={data.customer_inspected_initial ?? ''}
-              onChange={(e) => onChange('customer_inspected_initial', e.target.value)}
-            />
-          ) : (
-            <span>{data.customer_inspected_initial || '________'}</span>
-          )}
-        </div>
-        <div className="init-line">
-          <span>
-            I have read all information above carefully. Kings Tire Wheels &amp; Auto Repair is
-            not liable for any damages incurred after vehicle has left the shop - Initial:
-          </span>
-          {isEdit ? (
-            <input
-              value={data.customer_read_initial ?? ''}
-              onChange={(e) => onChange('customer_read_initial', e.target.value)}
-            />
-          ) : (
-            <span>{data.customer_read_initial || '________'}</span>
-          )}
         </div>
       </div>
 

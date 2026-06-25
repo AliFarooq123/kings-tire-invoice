@@ -5,5 +5,5 @@ export async function login(username, password) {
       body: JSON.stringify({ username, password }),
     });
     if (!res.ok) throw new Error('Invalid credentials');
-    return res.json();
+    return res.json(); // { success, token }
   }

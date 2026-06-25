@@ -1,10 +1,13 @@
 const express = require('express');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 const { Pool } = require('pg');
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+const JWT_SECRET = process.env.JWT_SECRET || 'dev-insecure-secret-change-me';
+const TOKEN_EXPIRY = '8h';
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -35,10 +38,29 @@ app.post('/auth/login', (req, res) => {
     username === process.env.SHOP_USERNAME &&
     password === process.env.SHOP_PASSWORD
   ) {
-    return res.json({ success: true });
+    const token = jwt.sign({ username }, JWT_SECRET, { expiresIn: TOKEN_EXPIRY });
+    return res.json({ success: true, token });
   }
   return res.status(401).json({ error: 'Invalid credentials' });
 });
+
+// Auth middleware — requires a valid JWT in the Authorization header
+function requireAuth(req, res, next) {
+  const header = req.headers.authorization || '';
+  const token = header.startsWith('Bearer ') ? header.slice(7) : null;
+  if (!token) {
+    return res.status(401).json({ error: 'Missing authorization token' });
+  }
+  try {
+    req.user = jwt.verify(token, JWT_SECRET);
+    return next();
+  } catch {
+    return res.status(401).json({ error: 'Invalid or expired token' });
+  }
+}
+
+// Protect all /invoices routes
+app.use('/invoices', requireAuth);
 
 function extractInvoiceFields(body) {
   const {

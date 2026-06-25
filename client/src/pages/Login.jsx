@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../api/auth';
-import { setLoggedIn } from '../auth/storage';
+import { setToken } from '../auth/storage';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -14,8 +14,9 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      await login(username, password);
-      setLoggedIn();
+      const { token } = await login(username, password);
+      if (!token) throw new Error('No token returned');
+      setToken(token);
       navigate('/');
     } catch {
       setError('Invalid username or password.');

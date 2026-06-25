@@ -4,13 +4,13 @@ import Search from './pages/Search';
 import InvoiceDetail from './pages/InvoiceDetail';
 import Login from './pages/Login';
 import ProtectedRoute from './components/ProtectedRoute';
-import { clearLoggedIn, isLoggedIn } from './auth/storage';
+import { clearToken, isLoggedIn } from './auth/storage';
 
 function Nav() {
   const navigate = useNavigate();
   if (!isLoggedIn()) return null;
   const handleLogout = () => {
-    clearLoggedIn();
+    clearToken();
     navigate('/login');
   };
   return (

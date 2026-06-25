@@ -15,59 +15,118 @@ function vehicleLabel(row) {
   return parts.length ? parts.join(' ') : '—';
 }
 
+function ResultsList({ results, searched, loading, error, onOpen, onDelete, deletingId }) {
+  if (error) return <p className="error-msg">{error}</p>;
+  if (loading) return <p className="loading-text">Searching…</p>;
+  if (searched && results.length === 0) {
+    return <p className="loading-text">No invoices found.</p>;
+  }
+  return (
+    <ul className="search-results">
+      {results.map((row) => (
+        <li key={row.id} className="search-result-row">
+          <div className="search-result-body" onClick={() => onOpen(row.id)}>
+            <strong>{row.customer_name || 'Unknown'}</strong>
+            <div className="result-meta">
+              {row.ard_number != null && <span>{formatArdNumber(row.ard_number)} · </span>}
+              {formatDate(row)} · {vehicleLabel(row)}
+              {row.license_plate ? ` · ${row.license_plate}` : ''} · $
+              {formatMoney(row.total)}
+            </div>
+          </div>
+          <button
+            type="button"
+            className="btn-delete no-print"
+            onClick={(e) => onDelete(e, row.id)}
+            disabled={deletingId === row.id}
+          >
+            {deletingId === row.id ? 'Deleting…' : 'Delete'}
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export default function Search() {
   const navigate = useNavigate();
-  const [query, setQuery] = useState('');
+
+  // Date range search (left)
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [results, setResults] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [searched, setSearched] = useState(false);
+  const [dateResults, setDateResults] = useState([]);
+  const [dateLoading, setDateLoading] = useState(false);
+  const [dateError, setDateError] = useState('');
+  const [dateSearched, setDateSearched] = useState(false);
+
+  // Text search (right)
+  const [query, setQuery] = useState('');
+  const [textResults, setTextResults] = useState([]);
+  const [textLoading, setTextLoading] = useState(false);
+  const [textError, setTextError] = useState('');
+  const [textSearched, setTextSearched] = useState(false);
+
   const [deletingId, setDeletingId] = useState(null);
 
-  const runSearch = useCallback(async () => {
-    const trimmed = query.trim();
-    const hasText = trimmed.length >= 2;
-    const hasDates = startDate || endDate;
+  const handleDateSearch = useCallback(
+    async (e) => {
+      e.preventDefault();
+      if (!startDate && !endDate) {
+        setDateError('Select a From and/or To date.');
+        setDateResults([]);
+        setDateSearched(false);
+        return;
+      }
+      setDateError('');
+      setDateLoading(true);
+      setDateSearched(true);
+      try {
+        const rows = await searchInvoices({ startDate, endDate });
+        setDateResults(rows);
+      } catch (err) {
+        setDateError(err.message || 'Search failed');
+        setDateResults([]);
+      } finally {
+        setDateLoading(false);
+      }
+    },
+    [startDate, endDate]
+  );
 
-    if (!hasText && !hasDates) {
-      setError('Enter at least 2 characters to search, or select a date range.');
-      setResults([]);
-      setSearched(false);
-      return;
-    }
+  const handleTextSearch = useCallback(
+    async (e) => {
+      e.preventDefault();
+      const trimmed = query.trim();
+      if (trimmed.length < 2) {
+        setTextError('Enter at least 2 characters to search.');
+        setTextResults([]);
+        setTextSearched(false);
+        return;
+      }
+      setTextError('');
+      setTextLoading(true);
+      setTextSearched(true);
+      try {
+        const rows = await searchInvoices({ q: trimmed });
+        setTextResults(rows);
+      } catch (err) {
+        setTextError(err.message || 'Search failed');
+        setTextResults([]);
+      } finally {
+        setTextLoading(false);
+      }
+    },
+    [query]
+  );
 
-    setError('');
-    setLoading(true);
-    setSearched(true);
-    try {
-      const rows = await searchInvoices({
-        q: hasText ? trimmed : '',
-        startDate,
-        endDate,
-      });
-      setResults(rows);
-    } catch (err) {
-      setError(err.message || 'Search failed');
-      setResults([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [query, startDate, endDate]);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    runSearch();
-  };
-
-  const handleDelete = async (e, rowId) => {
+  const handleDelete = async (e, id) => {
     e.stopPropagation();
     if (!window.confirm('Are you sure you want to delete this invoice?')) return;
-    setDeletingId(rowId);
+    setDeletingId(id);
     try {
-      await deleteInvoice(rowId);
-      setResults((prev) => prev.filter((r) => r.id !== rowId));
+      await deleteInvoice(id);
+      setDateResults((prev) => prev.filter((r) => r.id !== id));
+      setTextResults((prev) => prev.filter((r) => r.id !== id));
     } catch {
       alert('Failed to delete invoice. Please try again.');
     } finally {
@@ -75,79 +134,70 @@ export default function Search() {
     }
   };
 
+  const openInvoice = (id) => navigate(`/invoices/${id}`);
+
   return (
     <div className="search-page">
-      <div className="search-layout">
-        <aside className="search-filters no-print">
-          <h2>Date Range</h2>
-          <label htmlFor="start-date">From</label>
-          <input
-            id="start-date"
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
+      <div className="search-sections">
+        <section className="search-section">
+          <h2>Search by Date Range</h2>
+          <form className="search-form no-print" onSubmit={handleDateSearch}>
+            <div className="date-range-fields">
+              <label>
+                From
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                />
+              </label>
+              <label>
+                To
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                />
+              </label>
+            </div>
+            <button type="submit" className="btn-primary" disabled={dateLoading}>
+              {dateLoading ? 'Searching…' : 'Search'}
+            </button>
+          </form>
+          <ResultsList
+            results={dateResults}
+            searched={dateSearched}
+            loading={dateLoading}
+            error={dateError}
+            onOpen={openInvoice}
+            onDelete={handleDelete}
+            deletingId={deletingId}
           />
-          <label htmlFor="end-date">To</label>
-          <input
-            id="end-date"
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-          />
-        </aside>
+        </section>
 
-        <div className="search-main">
-          <h1>Search Invoices</h1>
-          <form className="search-form no-print" onSubmit={handleSubmit}>
+        <section className="search-section">
+          <h2>Search by Name / Phone / Plate / VIN</h2>
+          <form className="search-form no-print" onSubmit={handleTextSearch}>
             <input
               type="search"
               placeholder="Name, phone, plate, VIN, or ARD number…"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
-            <button type="submit" className="btn-primary" disabled={loading}>
-              {loading ? 'Searching…' : 'Search'}
+            <button type="submit" className="btn-primary" disabled={textLoading}>
+              {textLoading ? 'Searching…' : 'Search'}
             </button>
           </form>
-
-          {error && <p className="error-msg">{error}</p>}
-          {loading && <p className="loading-text">Searching…</p>}
-          {!loading && searched && results.length === 0 && !error && (
-            <p className="loading-text">No invoices found.</p>
-          )}
-
-          <ul className="search-results">
-            {results.map((row) => (
-              <li
-                key={row.id}
-                className="search-result-row"
-              >
-                <div
-                  className="search-result-body"
-                  onClick={() => navigate(`/invoices/${row.id}`)}
-                >
-                  <strong>{row.customer_name || 'Unknown'}</strong>
-                  <div className="result-meta">
-                    {row.ard_number != null && (
-                      <span>{formatArdNumber(row.ard_number)} · </span>
-                    )}
-                    {formatDate(row)} · {vehicleLabel(row)}
-                    {row.license_plate ? ` · ${row.license_plate}` : ''} · $
-                    {formatMoney(row.total)}
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  className="btn-delete no-print"
-                  onClick={(e) => handleDelete(e, row.id)}
-                  disabled={deletingId === row.id}
-                >
-                  {deletingId === row.id ? 'Deleting…' : 'Delete'}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
+          <ResultsList
+            results={textResults}
+            searched={textSearched}
+            loading={textLoading}
+            error={textError}
+            onOpen={openInvoice}
+            onDelete={handleDelete}
+            deletingId={deletingId}
+          />
+        </section>
       </div>
     </div>
   );
