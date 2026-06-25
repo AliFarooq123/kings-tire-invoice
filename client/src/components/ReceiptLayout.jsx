@@ -347,7 +347,6 @@ export default function ReceiptLayout({
                     <input
                       value={item.amount ?? ''}
                       onChange={(e) => onItemChange(i, 'amount', e.target.value)}
-                      placeholder="unit $"
                     />
                   ) : (
                     <AmountDisplay value={extended} />

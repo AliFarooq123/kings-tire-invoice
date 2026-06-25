@@ -1,25 +1,43 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 106" width="120" height="106">
-  <!-- Black rounded banner -->
-  <rect x="6" y="70" width="108" height="34" rx="17" ry="17" fill="#000"/>
-  <text x="60" y="93" text-anchor="middle" fill="#fff"
-        font-family="Georgia, 'Times New Roman', serif" font-size="21"
-        font-weight="bold" font-style="italic">King's</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 100" width="120" height="100">
+  <!--
+    5-point solid black crown.
+    Ball finials at all 5 peaks and 2 bottom corners.
+    "King's" in white italic bold inside the lower crown body.
+  -->
 
-  <!-- White crown with black outline — 3 peaks, sits on banner -->
-  <path fill="#fff" stroke="#000" stroke-width="2.4" stroke-linejoin="round"
-        d="
-    M16 70
-    L16 54 L30 36 L46 50
-    L60 16 L74 50 L90 36 L104 54
-    L104 70
-    Z"/>
+  <!-- Crown silhouette -->
+  <path fill="#000" stroke="none" d="
+    M 8  82
+    L 8  50
+    L 24 28
+    L 40 46
+    L 60 10
+    L 80 46
+    L 96 28
+    L 112 50
+    L 112 82
+    Z
+  "/>
 
-  <!-- Ball tips: 3 peaks -->
-  <circle cx="30" cy="34" r="6" fill="#fff" stroke="#000" stroke-width="2"/>
-  <circle cx="60" cy="12" r="6.5" fill="#fff" stroke="#000" stroke-width="2"/>
-  <circle cx="90" cy="34" r="6" fill="#fff" stroke="#000" stroke-width="2"/>
+  <!-- Ball tips: 5 peaks -->
+  <circle cx="24"  cy="26" r="5"   fill="#000"/>
+  <circle cx="40"  cy="44" r="4.5" fill="#000"/>
+  <circle cx="60"  cy="8"  r="6"   fill="#000"/>
+  <circle cx="80"  cy="44" r="4.5" fill="#000"/>
+  <circle cx="96"  cy="26" r="5"   fill="#000"/>
 
   <!-- Ball tips: 2 bottom corners -->
-  <circle cx="16" cy="68" r="5.5" fill="#fff" stroke="#000" stroke-width="2"/>
-  <circle cx="104" cy="68" r="5.5" fill="#fff" stroke="#000" stroke-width="2"/>
+  <circle cx="8"   cy="82" r="5"   fill="#000"/>
+  <circle cx="112" cy="82" r="5"   fill="#000"/>
+
+  <!-- "King's" text centered in the lower body of the crown -->
+  <text
+    x="60" y="74"
+    text-anchor="middle"
+    fill="#fff"
+    font-family="Arial Black, Arial, Helvetica, sans-serif"
+    font-size="22"
+    font-weight="900"
+    font-style="italic"
+  >King's</text>
 </svg>
