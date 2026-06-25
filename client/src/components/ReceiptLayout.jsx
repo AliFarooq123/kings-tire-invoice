@@ -1,7 +1,6 @@
 import kingsLogo from '../assets/kings-logo.svg';
 import {
   formatMoney,
-  formatArdNumber,
   lineTotal,
 } from '../utils/calculations';
 
@@ -106,7 +105,7 @@ export default function ReceiptLayout({
       : Array.from({ length: 10 }, () => ({ qty: '', description: '', amount: '' }));
 
   const handleField = (field) => (val) => onChange?.(field, val);
-  const displayArd = formatArdNumber(ardNumber ?? data?.ard_number);
+  const counterNumber = ardNumber ?? data?.ard_number;
 
   const renderTotalRow = (label, field, editable = false) => (
     <div className={`total-row ${!editable ? 'total-readonly' : ''}`}>
@@ -133,6 +132,11 @@ export default function ReceiptLayout({
       <header className="receipt-header">
         <div className="receipt-logo">
           <img src={kingsLogo} alt="King's Tire" />
+          {counterNumber && (
+            <span style={{ fontSize: '7pt', color: '#555', marginTop: '2px', display: 'block' }}>
+              #{counterNumber}
+            </span>
+          )}
         </div>
         <div>
           <h1 className="receipt-shop-title">TIRE WHEELS &amp; AUTO REPAIR</h1>
@@ -144,7 +148,7 @@ export default function ReceiptLayout({
         <div className="receipt-invoice-label">
           <h2>INVOICE</h2>
           <div className="receipt-ard-box" aria-label="ARD number">
-            {displayArd}
+            ARD00289317
           </div>
         </div>
       </header>
@@ -325,21 +329,18 @@ export default function ReceiptLayout({
             onChange={(v) => onChange?.('special_tire_pressure', v)}
             label="TIRE PRESSURE SET ACCORDING TO FACTORY SPECIFICATIONS ___________"
           />
-
           <CheckboxField
             mode={mode}
             checked={data.special_valve_stem}
             onChange={(v) => onChange?.('special_valve_stem', v)}
             label="New Valve Stem Installed"
           />
-
           <CheckboxField
             mode={mode}
             checked={data.special_torque_lugs}
             onChange={(v) => onChange?.('special_torque_lugs', v)}
             label="Torque All Lugnuts by Factory Specifications"
           />
-
           <CheckboxField
             mode={mode}
             checked={data.special_alignment}

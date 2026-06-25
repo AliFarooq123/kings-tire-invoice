@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { searchInvoices } from '../api/invoices';
+import { searchInvoices, deleteInvoice } from '../api/invoices';
 import { formatMoney, formatArdNumber } from '../utils/calculations';
 
 function formatDate(row) {
@@ -24,6 +24,7 @@ export default function Search() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [searched, setSearched] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
 
   const runSearch = useCallback(async (q) => {
     const trimmed = q.trim();
@@ -33,7 +34,6 @@ export default function Search() {
       setSearched(false);
       return;
     }
-
     setError('');
     setLoading(true);
     setSearched(true);
@@ -53,6 +53,20 @@ export default function Search() {
     runSearch(query);
   };
 
+  const handleDelete = async (e, id) => {
+    e.stopPropagation();
+    if (!window.confirm('Are you sure you want to delete this invoice? This cannot be undone.')) return;
+    setDeletingId(id);
+    try {
+      await deleteInvoice(id);
+      setResults((prev) => prev.filter((r) => r.id !== id));
+    } catch {
+      alert('Failed to delete invoice. Please try again.');
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   return (
     <div className="search-page">
       <h1>Search Invoices</h1>
@@ -69,25 +83,41 @@ export default function Search() {
       </form>
 
       {error && <p className="error-msg">{error}</p>}
-
       {loading && <p className="loading-text">Searching…</p>}
-
       {!loading && searched && results.length === 0 && !error && (
         <p className="loading-text">No invoices found.</p>
       )}
 
       <ul className="search-results">
         {results.map((row) => (
-          <li key={row.id} onClick={() => navigate(`/invoices/${row.id}`)}>
-            <strong>{row.customer_name || 'Unknown'}</strong>
-            <div className="result-meta">
-              {row.ard_number != null && (
-                <span>{formatArdNumber(row.ard_number)} · </span>
-              )}
-              {formatDate(row)} · {vehicleLabel(row)}
-              {row.license_plate ? ` · ${row.license_plate}` : ''} · $
-              {formatMoney(row.total)}
+          <li key={row.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ flex: 1, cursor: 'pointer' }} onClick={() => navigate(`/invoices/${row.id}`)}>
+              <strong>{row.customer_name || 'Unknown'}</strong>
+              <div className="result-meta">
+                {row.ard_number != null && (
+                  <span>{formatArdNumber(row.ard_number)} · </span>
+                )}
+                {formatDate(row)} · {vehicleLabel(row)}
+                {row.license_plate ? ` · ${row.license_plate}` : ''} · $
+                {formatMoney(row.total)}
+              </div>
             </div>
+            <button
+              onClick={(e) => handleDelete(e, row.id)}
+              disabled={deletingId === row.id}
+              style={{
+                marginLeft: '1rem',
+                padding: '0.4rem 0.85rem',
+                background: '#c0392b',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              {deletingId === row.id ? 'Deleting…' : 'Delete'}
+            </button>
           </li>
         ))}
       </ul>

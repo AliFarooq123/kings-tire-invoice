@@ -28,6 +28,19 @@ app.get('/', (req, res) => {
   res.json({ message: 'Kings Tire API is running' });
 });
 
+// Login
+app.post('/auth/login', (req, res) => {
+  const { username, password } = req.body;
+  if (
+    process.env.SHOP_USERNAME &&
+    username === process.env.SHOP_USERNAME &&
+    password === process.env.SHOP_PASSWORD
+  ) {
+    return res.json({ success: true });
+  }
+  return res.status(401).json({ error: 'Invalid credentials' });
+});
+
 // Save a new invoice
 app.post('/invoices', async (req, res) => {
   const {
@@ -117,6 +130,22 @@ app.get('/invoices/search', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Search failed' });
+  }
+});
+
+// Delete an invoice
+app.delete('/invoices/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    await pool.query(`DELETE FROM invoice_items WHERE invoice_id = $1`, [id]);
+    const result = await pool.query(`DELETE FROM invoices WHERE id = $1 RETURNING id`, [id]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Invoice not found' });
+    }
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to delete invoice' });
   }
 });
 
