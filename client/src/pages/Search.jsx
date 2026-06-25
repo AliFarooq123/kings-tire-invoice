@@ -180,7 +180,7 @@ export default function Search() {
           <form className="search-form no-print" onSubmit={handleTextSearch}>
             <input
               type="search"
-              placeholder="Name, phone, plate, VIN, or ARD number…"
+              placeholder="Name, phone, plate, or VIN"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
