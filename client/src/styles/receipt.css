@@ -4,8 +4,7 @@
   --receipt-qty: 0.42in;
   --receipt-amount: 1.12in;
   --receipt-cents: 0.26in;
-  --receipt-total-label: 0.52in;
-  --receipt-totals: calc(var(--receipt-total-label) + var(--receipt-amount));
+  --receipt-totals-width: 1.72in;
 }
 
 .app-nav {
@@ -276,7 +275,7 @@
 /* Header */
 .receipt-header {
   display: grid;
-  grid-template-columns: 0.78in 1fr auto;
+  grid-template-columns: 0.82in 1fr auto;
   gap: 0.06in;
   align-items: start;
   margin-bottom: 0.04in;
@@ -288,7 +287,7 @@
 
 .receipt-logo img,
 .receipt-logo svg {
-  width: 0.78in;
+  width: 0.82in;
   height: auto;
   display: block;
   margin: 0 auto;
@@ -599,18 +598,20 @@
   padding: 0.025in;
 }
 
-/* Bottom: left specials + right totals (values align under AMOUNT column) */
+/* Bottom: left specials + right totals (full-width boxes, equal height) */
 .receipt-bottom {
   display: grid;
-  grid-template-columns: 1fr var(--receipt-totals);
+  grid-template-columns: 1fr var(--receipt-totals-width);
   border: 1px solid #000;
   border-top: none;
+  align-items: stretch;
 }
 
 .receipt-bottom-left {
   border-right: 1px solid #000;
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .receipt-specials {
@@ -669,24 +670,31 @@
   margin: 0.015in 0;
 }
 
-/* Totals — labels + values fit inside AMOUNT column width */
+/* Totals — 8 equal rows filling full right column height */
 .receipt-totals {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: repeat(8, minmax(0, 1fr));
+  width: 100%;
+  min-width: 0;
+  align-self: stretch;
 }
 
 .total-row {
   display: grid;
-  grid-template-columns: var(--receipt-total-label) var(--receipt-amount);
+  grid-template-columns: 1fr 1fr;
   border-bottom: 1px solid #000;
-  height: 0.21in;
-  min-height: 0.21in;
-  max-height: 0.21in;
+  border-left: 1px solid #000;
+  border-right: 1px solid #000;
+  min-height: 0;
   align-items: stretch;
 }
 
+.total-row:first-child {
+  border-top: 1px solid #000;
+}
+
 .total-row:last-child {
-  border-bottom: none;
+  border-bottom: 1px solid #000;
 }
 
 .total-row label {
@@ -701,6 +709,7 @@
   white-space: normal;
   overflow: visible;
   text-transform: uppercase;
+  min-width: 0;
 }
 
 .total-row label.total-label-stacked {
@@ -718,10 +727,11 @@
 
 .total-amount-cell {
   padding: 0;
-  overflow: hidden;
+  overflow: visible;
   display: flex;
   align-items: stretch;
   min-width: 0;
+  width: 100%;
 }
 
 .total-amount-cell .amount-split {
@@ -734,6 +744,7 @@
 .total-amount-cell .amount-dollars-input {
   flex: 1;
   min-width: 0;
+  width: 100%;
   text-align: right;
   padding: 0 0.025in;
   font-size: 7.5pt;
@@ -743,7 +754,6 @@
 }
 
 .total-amount-cell .amount-dollars-input {
-  width: 100%;
   height: 100%;
   border: none;
   background: transparent;
@@ -757,6 +767,9 @@
 
 .total-amount-cell .amount-cents-divider {
   width: var(--receipt-cents);
+  flex-shrink: 0;
+  height: 100%;
+  border-left: 1px dashed #666;
 }
 
 .total-amount-cell .amount-cents-readonly {
