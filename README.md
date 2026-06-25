@@ -119,8 +119,6 @@ Client runs at `http://localhost:5173`, API at `http://localhost:3001` (proxied 
 
 ## Planned Features (v2)
 
-- PDF export
-- Customer history page (all invoices for one customer)
 - Revenue and analytics dashboard
 - SMS receipt to customer
 - Multi-user support with individual employee accounts
