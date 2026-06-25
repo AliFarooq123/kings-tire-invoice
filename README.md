@@ -9,12 +9,6 @@ Built by **Ali Farooq**, CS student at Sacramento State University.
 
 ---
 
-## Screenshots
-
-_Screenshots coming soon._
-
----
-
 ## Tech Stack
 
 - **Frontend:** React + Vite + React Router (deployed on Vercel)
