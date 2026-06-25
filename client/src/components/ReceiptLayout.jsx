@@ -1,8 +1,12 @@
 import kingsLogo from '../assets/kings-logo.svg';
+import DateField from './DateField';
+import { MIN_LINE_ROWS } from '../constants/receipt';
 import {
   formatMoney,
+  formatArdNumber,
   lineTotal,
 } from '../utils/calculations';
+import { padLineItems } from '../hooks/useInvoiceForm';
 
 const LEGAL_TEXT = `CUSTOMERS: PLEASE NOTE: NOT RESPONSIBLE FOR BROKEN OR LOST HUB CAPS, VALVE STEM CAPS, ANTENNAS, OR ANY OTHER PARTS LEFT IN OR ON VEHICLE. NOT RESPONSIBLE FOR ANY DAMAGES TO VEHICLE AFTER IT HAS LEFT THE SHOP. NOT RESPONSIBLE FOR DAMAGES CAUSED BY IMPROPER INSTALLATION OF CUSTOMER SUPPLIED PARTS. WARRANTY ON PARTS AND LABOR AS STATED ABOVE ONLY. ALL WARRANTIES VOID IF VEHICLE IS TOWED, JUMPED, OR WORKED ON BY ANOTHER SHOP. CUSTOMER IS RESPONSIBLE FOR PAYMENT IN FULL. MECHANIC'S LIEN MAY BE ENFORCED FOR NON-PAYMENT.`;
 
@@ -77,10 +81,8 @@ function PaymentOption({ mode, label, field, data, onPaymentChange }) {
   );
 }
 
-function AmountDisplay({ value, mode }) {
-  const display =
-    mode === 'view' ? formatMoney(value) : value != null && value !== '' ? String(value) : '';
-  const { dollars, cents } = splitAmount(display || 0);
+function AmountDisplay({ value }) {
+  const { dollars, cents } = splitAmount(value || 0);
   return (
     <div className="amount-split">
       <span className="amount-dollars">{dollars}</span>
@@ -99,29 +101,32 @@ export default function ReceiptLayout({
   onPaymentChange,
 }) {
   const isEdit = mode === 'edit';
-  const displayItems =
-    items.length > 0
-      ? items
-      : Array.from({ length: 10 }, () => ({ qty: '', description: '', amount: '' }));
+  const displayItems = padLineItems(
+    items.length > 0 ? items : Array.from({ length: MIN_LINE_ROWS }, () => ({
+      qty: '',
+      description: '',
+      amount: '',
+    })),
+    MIN_LINE_ROWS
+  );
 
   const handleField = (field) => (val) => onChange?.(field, val);
-  const counterNumber = ardNumber ?? data?.ard_number;
+  const displayArd = formatArdNumber(ardNumber ?? data?.ard_number);
 
-  const renderTotalRow = (label, field, editable = false) => (
-    <div className={`total-row ${!editable ? 'total-readonly' : ''}`}>
+  const renderTotalRow = (label, field) => (
+    <div className="total-row">
       <label>{label}</label>
-      {isEdit && editable ? (
+      {isEdit ? (
         <input
           className="total-input"
-          type="number"
-          step="0.01"
-          min="0"
+          type="text"
+          inputMode="decimal"
           value={data[field] ?? ''}
           onChange={(e) => onChange(field, e.target.value)}
         />
       ) : (
         <div className="total-value">
-          <AmountDisplay value={data[field]} mode="view" />
+          <AmountDisplay value={data[field]} />
         </div>
       )}
     </div>
@@ -132,13 +137,8 @@ export default function ReceiptLayout({
       <header className="receipt-header">
         <div className="receipt-logo">
           <img src={kingsLogo} alt="King's Tire" />
-          {counterNumber && (
-            <span style={{ fontSize: '7pt', color: '#555', marginTop: '2px', display: 'block' }}>
-              #{counterNumber}
-            </span>
-          )}
         </div>
-        <div>
+        <div className="receipt-shop-block">
           <h1 className="receipt-shop-title">TIRE WHEELS &amp; AUTO REPAIR</h1>
           <p className="receipt-shop-info">
             6150 Watt Ave., North Highlands, CA 95660 • Tel: (916) 571-5051
@@ -148,83 +148,90 @@ export default function ReceiptLayout({
         <div className="receipt-invoice-label">
           <h2>INVOICE</h2>
           <div className="receipt-ard-box" aria-label="ARD number">
-            ARD00289317
+            {displayArd}
           </div>
         </div>
       </header>
 
       <div className="receipt-banner">CUSTOMER: PLEASE FILL IN ALL THE INFORMATION BELOW</div>
 
-      <div className="receipt-customer-grid">
-        <Cell label="Name:">
-          <FieldInput
-            mode={mode}
-            value={data.customer_name}
-            onChange={handleField('customer_name')}
-          />
-        </Cell>
-        <Cell label="Phone:">
-          <FieldInput mode={mode} value={data.phone} onChange={handleField('phone')} />
-        </Cell>
-        <Cell label="Date:">
-          <FieldInput
-            mode={mode}
-            value={data.date}
-            onChange={handleField('date')}
-            type={isEdit ? 'date' : 'text'}
-          />
-        </Cell>
-        <Cell label="Address:" className="span-2">
-          <FieldInput mode={mode} value={data.address} onChange={handleField('address')} />
-        </Cell>
-        <Cell label="Year - Make:">
-          <span className="field-value" style={{ display: 'flex', gap: '0.08in', flex: 1 }}>
+      <div className="receipt-customer-section">
+        <div className="receipt-customer-row row-1">
+          <Cell label="Name:">
+            <FieldInput
+              mode={mode}
+              value={data.customer_name}
+              onChange={handleField('customer_name')}
+            />
+          </Cell>
+          <Cell label="Phone:">
+            <FieldInput mode={mode} value={data.phone} onChange={handleField('phone')} />
+          </Cell>
+          <Cell label="Date:">
             {isEdit ? (
-              <>
-                <input
-                  value={data.vehicle_year ?? ''}
-                  onChange={(e) => onChange('vehicle_year', e.target.value)}
-                  placeholder="Year"
-                  style={{ width: '0.45in' }}
-                />
-                <input
-                  value={data.vehicle_make ?? ''}
-                  onChange={(e) => onChange('vehicle_make', e.target.value)}
-                  placeholder="Make"
-                  style={{ flex: 1 }}
-                />
-              </>
+              <DateField mode="edit" value={data.date} onChange={handleField('date')} />
             ) : (
-              `${data.vehicle_year ?? ''} ${data.vehicle_make ?? ''}`.trim()
+              <DateField mode="view" value={data.date} />
             )}
-          </span>
-        </Cell>
-        <Cell label="City:">
-          <FieldInput mode={mode} value={data.city} onChange={handleField('city')} />
-        </Cell>
-        <Cell label="State:">
-          <FieldInput mode={mode} value={data.state} onChange={handleField('state')} />
-        </Cell>
-        <Cell label="Zip:">
-          <FieldInput mode={mode} value={data.zip} onChange={handleField('zip')} />
-        </Cell>
-        <Cell label="Model:">
-          <FieldInput
-            mode={mode}
-            value={data.vehicle_model}
-            onChange={handleField('vehicle_model')}
-          />
-        </Cell>
-        <Cell label="Vehicle ID NO" className="span-2">
-          <FieldInput mode={mode} value={data.vin} onChange={handleField('vin')} />
-        </Cell>
-        <Cell label="License NO:">
-          <FieldInput
-            mode={mode}
-            value={data.license_plate}
-            onChange={handleField('license_plate')}
-          />
-        </Cell>
+          </Cell>
+        </div>
+        <div className="receipt-customer-row row-2">
+          <Cell label="Address:">
+            <FieldInput mode={mode} value={data.address} onChange={handleField('address')} />
+          </Cell>
+          <Cell label="Year - Make:">
+            <span className="field-value year-make-fields">
+              {isEdit ? (
+                <>
+                  <input
+                    value={data.vehicle_year ?? ''}
+                    onChange={(e) => onChange('vehicle_year', e.target.value)}
+                    placeholder="Year"
+                    className="year-input"
+                  />
+                  <input
+                    value={data.vehicle_make ?? ''}
+                    onChange={(e) => onChange('vehicle_make', e.target.value)}
+                    placeholder="Make"
+                    className="make-input"
+                  />
+                </>
+              ) : (
+                `${data.vehicle_year ?? ''} ${data.vehicle_make ?? ''}`.trim()
+              )}
+            </span>
+          </Cell>
+        </div>
+        <div className="receipt-customer-row row-3">
+          <Cell label="City:">
+            <FieldInput mode={mode} value={data.city} onChange={handleField('city')} />
+          </Cell>
+          <Cell label="State:">
+            <FieldInput mode={mode} value={data.state} onChange={handleField('state')} />
+          </Cell>
+          <Cell label="Zip:">
+            <FieldInput mode={mode} value={data.zip} onChange={handleField('zip')} />
+          </Cell>
+          <Cell label="Model:">
+            <FieldInput
+              mode={mode}
+              value={data.vehicle_model}
+              onChange={handleField('vehicle_model')}
+            />
+          </Cell>
+        </div>
+        <div className="receipt-customer-row row-4">
+          <Cell label="Vehicle ID NO">
+            <FieldInput mode={mode} value={data.vin} onChange={handleField('vin')} />
+          </Cell>
+          <Cell label="License NO:">
+            <FieldInput
+              mode={mode}
+              value={data.license_plate}
+              onChange={handleField('license_plate')}
+            />
+          </Cell>
+        </div>
       </div>
 
       <div className="receipt-payment-row">
@@ -272,10 +279,7 @@ export default function ReceiptLayout({
         </thead>
         <tbody>
           {displayItems.map((item, i) => {
-            const extended =
-              mode === 'view'
-                ? lineTotal(item.qty, item.amount)
-                : null;
+            const extended = mode === 'view' ? lineTotal(item.qty, item.amount) : null;
             return (
               <tr key={i}>
                 <td>
@@ -306,7 +310,7 @@ export default function ReceiptLayout({
                       placeholder="unit $"
                     />
                   ) : (
-                    <AmountDisplay value={extended} mode="view" />
+                    <AmountDisplay value={extended} />
                   )}
                 </td>
               </tr>
@@ -339,7 +343,7 @@ export default function ReceiptLayout({
             mode={mode}
             checked={data.special_torque_lugs}
             onChange={(v) => onChange?.('special_torque_lugs', v)}
-            label="Torque All Lugnuts by Factory Specifications"
+            label="Torgue All Lugunts by Factory Specifications"
           />
           <CheckboxField
             mode={mode}
@@ -384,7 +388,7 @@ export default function ReceiptLayout({
               mode={mode}
               checked={data.special_no_read_hazardous}
               onChange={(v) => onChange?.('special_no_read_hazardous', v)}
-              label="No Road Hazardous"
+              label="No Read Hazardous"
             />
             <CheckboxField
               mode={mode}
@@ -410,7 +414,7 @@ export default function ReceiptLayout({
             mode={mode}
             checked={data.special_not_aligned}
             onChange={(v) => onChange?.('special_not_aligned', v)}
-            label="Vehicle Was Not Aligned Properly At Time Of Installment"
+            label="Vehicle Was Not Aligned Property At Time Of Installment"
           />
 
           <div className="special-grid-2">
@@ -418,7 +422,7 @@ export default function ReceiptLayout({
               mode={mode}
               checked={data.special_new_or_used_shown}
               onChange={(v) => onChange?.('special_new_or_used_shown', v)}
-              label="New or Used Tires Shown to Customer Before Installation"
+              label="New or Used Tiree Shown to Customer Before Installation"
             />
             <CheckboxField
               mode={mode}
@@ -430,14 +434,14 @@ export default function ReceiptLayout({
         </div>
 
         <div className="receipt-totals">
-          {renderTotalRow('LABOR', 'labor', true)}
-          {renderTotalRow('SUB TOTAL', 'subtotal', false)}
-          {renderTotalRow('SALES TAX', 'sales_tax', false)}
-          {renderTotalRow('NEW TIRE FEE', 'new_tire_fee', true)}
-          {renderTotalRow('TIRE / OIL DISPOSAL', 'tire_oil_disposal', true)}
-          {renderTotalRow('TOTAL', 'total', false)}
-          {renderTotalRow('DEPOSIT', 'deposit', true)}
-          {renderTotalRow('BALANCE DUE', 'balance_due', false)}
+          {renderTotalRow('LABOR', 'labor')}
+          {renderTotalRow('SUB TOTAL', 'subtotal')}
+          {renderTotalRow('SALES TAX', 'sales_tax')}
+          {renderTotalRow('NEW TIRE FEE', 'new_tire_fee')}
+          {renderTotalRow('TIRE / OIL DISPOSAL', 'tire_oil_disposal')}
+          {renderTotalRow('TOTAL', 'total')}
+          {renderTotalRow('DEPOSIT', 'deposit')}
+          {renderTotalRow('BALANCE DUE', 'balance_due')}
         </div>
       </div>
 
@@ -478,8 +482,9 @@ export default function ReceiptLayout({
           <span className="sig-label">CUSTOMER SIGNATURE</span>
           <div className="sig-line" aria-hidden="true" />
         </div>
-        <div style={{ textAlign: 'right', paddingTop: '0.2in' }}>
-          Kings Tire Wheels &amp; Auto Repair will not be responsible for any item left over 3 days.
+        <div className="receipt-footer-note">
+          Kings Tire Wheels &amp; Auto Repair will not be responsible for any item left over 3
+          days.
         </div>
       </div>
     </div>

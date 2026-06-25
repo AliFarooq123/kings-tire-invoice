@@ -61,9 +61,106 @@
 }
 
 .search-page {
-  max-width: 640px;
+  max-width: 960px;
   margin: 0 auto;
   padding: 1rem;
+}
+
+.search-layout {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.search-filters {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 1rem;
+}
+
+.search-filters h2 {
+  font-size: 0.95rem;
+  margin: 0 0 0.75rem;
+}
+
+.search-filters label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.search-filters input[type='date'] {
+  width: 100%;
+  padding: 0.4rem;
+  margin-bottom: 0.75rem;
+  border: 1px solid #999;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.search-main h1 {
+  margin-top: 0;
+}
+
+.success-msg {
+  color: #1b5e20;
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.suggestion-panel {
+  position: fixed;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 100;
+  background: #fff;
+  border: 2px solid #c9a227;
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  max-width: 220px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.suggestion-panel strong {
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+}
+
+.suggestion-panel .sep {
+  display: none;
+}
+
+@media (max-width: 1100px) {
+  .suggestion-panel {
+    position: static;
+    transform: none;
+    max-width: 8.5in;
+    margin: 0.75rem auto 0;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .suggestion-panel .sep {
+    display: inline;
+    color: #999;
+  }
+}
+
+@media (max-width: 720px) {
+  .search-layout {
+    grid-template-columns: 1fr;
+  }
 }
 
 .search-form {
@@ -91,13 +188,39 @@
   background: #fff;
   padding: 0.75rem 1rem;
   margin-bottom: 0.5rem;
-  cursor: pointer;
   border-radius: 4px;
 }
 
-.search-results li:hover {
-  border-color: #1a1a1a;
-  background: #f9f9f9;
+.search-result-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.search-result-body {
+  flex: 1;
+  cursor: pointer;
+}
+
+.search-result-body:hover {
+  opacity: 0.85;
+}
+
+.btn-delete {
+  padding: 0.4rem 0.85rem;
+  background: #c0392b;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.btn-delete:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .search-results .result-meta {
@@ -143,9 +266,14 @@
 
 .receipt-logo img,
 .receipt-logo svg {
-  width: 0.75in;
+  width: 0.85in;
   height: auto;
   display: block;
+}
+
+.receipt-shop-block {
+  text-align: center;
+  padding: 0 0.1in;
 }
 
 .receipt-shop-title {
@@ -204,17 +332,39 @@
   background: #f5f5f5;
 }
 
-/* Customer grid */
-.receipt-customer-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 0.75in;
+/* Customer section — row-based grid matching paper proportions */
+.receipt-customer-section {
   border: 1px solid #000;
   border-top: none;
 }
 
-.receipt-customer-grid .cell {
-  border-right: 1px solid #000;
+.receipt-customer-row {
+  display: grid;
   border-bottom: 1px solid #000;
+}
+
+.receipt-customer-row:last-child {
+  border-bottom: none;
+}
+
+.receipt-customer-row.row-1 {
+  grid-template-columns: 6.5fr 2fr 1.5fr;
+}
+
+.receipt-customer-row.row-2 {
+  grid-template-columns: 8.5fr 1.5fr;
+}
+
+.receipt-customer-row.row-3 {
+  grid-template-columns: 4.5fr 2fr 2fr 1.5fr;
+}
+
+.receipt-customer-row.row-4 {
+  grid-template-columns: 8.5fr 1.5fr;
+}
+
+.receipt-customer-row .cell {
+  border-right: 1px solid #000;
   padding: 0.02in 0.04in;
   display: flex;
   align-items: baseline;
@@ -222,33 +372,25 @@
   min-height: 0.22in;
 }
 
-.receipt-customer-grid .cell:last-child {
+.receipt-customer-row .cell:last-child {
   border-right: none;
 }
 
-.receipt-customer-grid .cell-full {
-  grid-column: 1 / -1;
-}
-
-.receipt-customer-grid .span-2 {
-  grid-column: span 2;
-}
-
-.receipt-customer-grid label {
+.receipt-customer-row label {
   font-size: 7pt;
   font-weight: bold;
   white-space: nowrap;
   flex-shrink: 0;
 }
 
-.receipt-customer-grid .field-value {
+.receipt-customer-row .field-value {
   flex: 1;
   min-width: 0;
   font-size: 9pt;
 }
 
-.receipt-customer-grid input,
-.receipt-customer-grid textarea {
+.receipt-customer-row input,
+.receipt-customer-row .date-input {
   flex: 1;
   min-width: 0;
   border: none;
@@ -260,10 +402,25 @@
   margin: 0;
 }
 
-.receipt-customer-grid input:focus,
-.receipt-customer-grid textarea:focus {
+.receipt-customer-row input:focus,
+.receipt-customer-row .date-input:focus {
   outline: none;
   border-bottom-color: #000;
+}
+
+.year-make-fields {
+  display: flex;
+  gap: 0.06in;
+  flex: 1;
+}
+
+.year-make-fields .year-input {
+  width: 0.5in;
+  flex: none;
+}
+
+.year-make-fields .make-input {
+  flex: 1;
 }
 
 /* Payment row + mileage */
@@ -350,7 +507,7 @@
 .receipt-items-table td {
   border: 1px solid #000;
   padding: 0;
-  height: 0.2in;
+  height: 0.19in;
   vertical-align: middle;
 }
 
@@ -471,6 +628,7 @@
 .receipt-totals {
   display: flex;
   flex-direction: column;
+  border-right: 1px solid #000;
 }
 
 .total-row {
@@ -478,7 +636,11 @@
   grid-template-columns: 1fr auto;
   border-bottom: 1px solid #000;
   min-height: 0.2in;
-  align-items: center;
+  align-items: stretch;
+}
+
+.total-row:first-child {
+  border-top: none;
 }
 
 .total-row:last-child {
@@ -490,6 +652,8 @@
   font-size: 7pt;
   padding: 0.02in 0.04in;
   border-right: 1px solid #000;
+  display: flex;
+  align-items: center;
 }
 
 .total-row .total-value {
@@ -497,6 +661,7 @@
   padding: 0;
   font-size: 8.5pt;
   min-width: 0.95in;
+  border-right: 1px solid #000;
 }
 
 .total-row .total-value .amount-split {
@@ -512,11 +677,14 @@
   width: 0.32in;
   padding: 0.02in 0.03in;
   font-size: 8pt;
+  border-left: 1px dashed #666;
 }
 
 .total-row input.total-input {
   width: 100%;
+  min-width: 0.95in;
   border: none;
+  border-right: 1px solid #000;
   text-align: right;
   font-size: 8.5pt;
   padding: 0.02in 0.06in;
@@ -526,10 +694,7 @@
 
 .total-row input.total-input:focus {
   outline: 1px solid #333;
-}
-
-.total-row.total-readonly .total-value {
-  background: #fafafa;
+  outline-offset: -1px;
 }
 
 /* Legal */
@@ -581,6 +746,12 @@
   border-top: none;
   font-size: 6.5pt;
   padding: 0.04in;
+}
+
+.receipt-footer-note {
+  text-align: right;
+  padding-top: 0.2in;
+  align-self: end;
 }
 
 .receipt-footer-signature {
@@ -654,7 +825,8 @@
     max-width: none;
   }
 
-  .receipt-customer-grid input,
+  .receipt-customer-row input,
+  .receipt-customer-row .date-input,
   .receipt-items-table input,
   .total-row input,
   .special-row input[type='text'],

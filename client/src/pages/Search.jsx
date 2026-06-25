@@ -2,13 +2,11 @@ import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { searchInvoices, deleteInvoice } from '../api/invoices';
 import { formatMoney, formatArdNumber } from '../utils/calculations';
+import { formatDisplayDate } from '../utils/dates';
 
 function formatDate(row) {
-  if (row.date) return row.date;
-  if (row.created_at) {
-    const d = new Date(row.created_at);
-    return d.toLocaleDateString('en-US');
-  }
+  if (row.date) return formatDisplayDate(row.date);
+  if (row.created_at) return formatDisplayDate(row.created_at);
   return '—';
 }
 
@@ -20,25 +18,35 @@ function vehicleLabel(row) {
 export default function Search() {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [searched, setSearched] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
 
-  const runSearch = useCallback(async (q) => {
-    const trimmed = q.trim();
-    if (trimmed.length < 2) {
-      setError('Enter at least 2 characters to search.');
+  const runSearch = useCallback(async () => {
+    const trimmed = query.trim();
+    const hasText = trimmed.length >= 2;
+    const hasDates = startDate || endDate;
+
+    if (!hasText && !hasDates) {
+      setError('Enter at least 2 characters to search, or select a date range.');
       setResults([]);
       setSearched(false);
       return;
     }
+
     setError('');
     setLoading(true);
     setSearched(true);
     try {
-      const rows = await searchInvoices(trimmed);
+      const rows = await searchInvoices({
+        q: hasText ? trimmed : '',
+        startDate,
+        endDate,
+      });
       setResults(rows);
     } catch (err) {
       setError(err.message || 'Search failed');
@@ -46,20 +54,20 @@ export default function Search() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [query, startDate, endDate]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    runSearch(query);
+    runSearch();
   };
 
-  const handleDelete = async (e, id) => {
+  const handleDelete = async (e, rowId) => {
     e.stopPropagation();
-    if (!window.confirm('Are you sure you want to delete this invoice? This cannot be undone.')) return;
-    setDeletingId(id);
+    if (!window.confirm('Are you sure you want to delete this invoice?')) return;
+    setDeletingId(rowId);
     try {
-      await deleteInvoice(id);
-      setResults((prev) => prev.filter((r) => r.id !== id));
+      await deleteInvoice(rowId);
+      setResults((prev) => prev.filter((r) => r.id !== rowId));
     } catch {
       alert('Failed to delete invoice. Please try again.');
     } finally {
@@ -69,58 +77,78 @@ export default function Search() {
 
   return (
     <div className="search-page">
-      <h1>Search Invoices</h1>
-      <form className="search-form no-print" onSubmit={handleSubmit}>
-        <input
-          type="search"
-          placeholder="Name, phone, plate, VIN, or ARD number…"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-        <button type="submit" className="btn-primary" disabled={loading}>
-          {loading ? 'Searching…' : 'Search'}
-        </button>
-      </form>
+      <div className="search-layout">
+        <aside className="search-filters no-print">
+          <h2>Date Range</h2>
+          <label htmlFor="start-date">From</label>
+          <input
+            id="start-date"
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+          />
+          <label htmlFor="end-date">To</label>
+          <input
+            id="end-date"
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+          />
+        </aside>
 
-      {error && <p className="error-msg">{error}</p>}
-      {loading && <p className="loading-text">Searching…</p>}
-      {!loading && searched && results.length === 0 && !error && (
-        <p className="loading-text">No invoices found.</p>
-      )}
-
-      <ul className="search-results">
-        {results.map((row) => (
-          <li key={row.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ flex: 1, cursor: 'pointer' }} onClick={() => navigate(`/invoices/${row.id}`)}>
-              <strong>{row.customer_name || 'Unknown'}</strong>
-              <div className="result-meta">
-                {row.ard_number != null && (
-                  <span>{formatArdNumber(row.ard_number)} · </span>
-                )}
-                {formatDate(row)} · {vehicleLabel(row)}
-                {row.license_plate ? ` · ${row.license_plate}` : ''} · $
-                {formatMoney(row.total)}
-              </div>
-            </div>
-            <button
-              onClick={(e) => handleDelete(e, row.id)}
-              disabled={deletingId === row.id}
-              style={{
-                marginLeft: '1rem',
-                padding: '0.4rem 0.85rem',
-                background: '#c0392b',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                whiteSpace: 'nowrap'
-              }}
-            >
-              {deletingId === row.id ? 'Deleting…' : 'Delete'}
+        <div className="search-main">
+          <h1>Search Invoices</h1>
+          <form className="search-form no-print" onSubmit={handleSubmit}>
+            <input
+              type="search"
+              placeholder="Name, phone, plate, VIN, or ARD number…"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+            <button type="submit" className="btn-primary" disabled={loading}>
+              {loading ? 'Searching…' : 'Search'}
             </button>
-          </li>
-        ))}
-      </ul>
+          </form>
+
+          {error && <p className="error-msg">{error}</p>}
+          {loading && <p className="loading-text">Searching…</p>}
+          {!loading && searched && results.length === 0 && !error && (
+            <p className="loading-text">No invoices found.</p>
+          )}
+
+          <ul className="search-results">
+            {results.map((row) => (
+              <li
+                key={row.id}
+                className="search-result-row"
+              >
+                <div
+                  className="search-result-body"
+                  onClick={() => navigate(`/invoices/${row.id}`)}
+                >
+                  <strong>{row.customer_name || 'Unknown'}</strong>
+                  <div className="result-meta">
+                    {row.ard_number != null && (
+                      <span>{formatArdNumber(row.ard_number)} · </span>
+                    )}
+                    {formatDate(row)} · {vehicleLabel(row)}
+                    {row.license_plate ? ` · ${row.license_plate}` : ''} · $
+                    {formatMoney(row.total)}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className="btn-delete no-print"
+                  onClick={(e) => handleDelete(e, row.id)}
+                  disabled={deletingId === row.id}
+                >
+                  {deletingId === row.id ? 'Deleting…' : 'Delete'}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
     </div>
   );
 }
