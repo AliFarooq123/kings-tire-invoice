@@ -5,14 +5,17 @@ import {
   formatMoney,
   lineTotal,
 } from '../utils/calculations';
-
-const STATIC_ARD = 'ARD00289317';
 import { padLineItems } from '../hooks/useInvoiceForm';
 
-const LEGAL_TEXT = `CUSTOMERS: PLEASE NOTE: NOT RESPONSIBLE FOR BROKEN OR LOST HUB CAPS, VALVE STEM CAPS, ANTENNAS, OR ANY OTHER PARTS LEFT IN OR ON VEHICLE. NOT RESPONSIBLE FOR ANY DAMAGES TO VEHICLE AFTER IT HAS LEFT THE SHOP. NOT RESPONSIBLE FOR DAMAGES CAUSED BY IMPROPER INSTALLATION OF CUSTOMER SUPPLIED PARTS. WARRANTY ON PARTS AND LABOR AS STATED ABOVE ONLY. ALL WARRANTIES VOID IF VEHICLE IS TOWED, JUMPED, OR WORKED ON BY ANOTHER SHOP. CUSTOMER IS RESPONSIBLE FOR PAYMENT IN FULL. MECHANIC'S LIEN MAY BE ENFORCED FOR NON-PAYMENT.`;
+const STATIC_ARD = 'ARD00289317';
+
+const LEGAL_LEAD =
+  'CUSTOMERS: PLEASE NOTE: NOT RESPONSIBLE FOR BROKEN OR LOST HUB CAPS, VALVE STEM CAPS, ANTENNAS, OR ANY OTHER PARTS LEFT IN OR ON VEHICLE.';
+
+const LEGAL_BODY = `NOT RESPONSIBLE FOR ANY DAMAGES TO VEHICLE AFTER IT HAS LEFT THE SHOP. NOT RESPONSIBLE FOR DAMAGES CAUSED BY IMPROPER INSTALLATION OF CUSTOMER SUPPLIED PARTS. WARRANTY ON PARTS AND LABOR AS STATED ABOVE ONLY. ALL WARRANTIES VOID IF VEHICLE IS TOWED, JUMPED, OR WORKED ON BY ANOTHER SHOP. CUSTOMER IS RESPONSIBLE FOR PAYMENT IN FULL. MECHANIC'S LIEN MAY BE ENFORCED FOR NON-PAYMENT.`;
 
 const NO_RETURNS =
-  'NO RETURNS ON ANY ITEMS SOLD BY KINGS TIRE WHEELS & AUTO REPAIR • NO CASH REFUND';
+  'NO RETURNS ON ANY ITEMS SOLD BY KINGS TIRE WHEELS & AUTO REPAIR - NO CASH REFUND';
 
 function splitAmount(value) {
   const formatted = formatMoney(value);
@@ -92,6 +95,35 @@ function AmountDisplay({ value }) {
   );
 }
 
+function TotalAmountField({ mode, value, onChange }) {
+  const { cents } = splitAmount(value || 0);
+  const centsDisplay =
+    value != null && value !== '' ? cents : '';
+
+  if (mode === 'view') {
+    return (
+      <div className="total-amount-cell">
+        <AmountDisplay value={value} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="total-amount-cell">
+      <div className="amount-split">
+        <input
+          className="amount-dollars-input"
+          type="text"
+          inputMode="decimal"
+          value={value ?? ''}
+          onChange={(e) => onChange(e.target.value)}
+        />
+        <span className="amount-cents-divider amount-cents-readonly">{centsDisplay}</span>
+      </div>
+    </div>
+  );
+}
+
 export default function ReceiptLayout({
   mode = 'view',
   data,
@@ -114,22 +146,23 @@ export default function ReceiptLayout({
   const handleField = (field) => (val) => onChange?.(field, val);
   const counterNumber = ardNumber ?? data?.ard_number;
 
-  const renderTotalRow = (label, field) => (
+  const renderTotalRow = (label, field, { stacked = false, emphasis = false } = {}) => (
     <div className="total-row">
-      <label>{label}</label>
-      {isEdit ? (
-        <input
-          className="total-input"
-          type="text"
-          inputMode="decimal"
-          value={data[field] ?? ''}
-          onChange={(e) => onChange(field, e.target.value)}
-        />
-      ) : (
-        <div className="total-value">
-          <AmountDisplay value={data[field]} />
-        </div>
-      )}
+      <label
+        className={[
+          stacked ? 'total-label-stacked' : '',
+          emphasis ? 'total-label-emphasis' : '',
+        ]
+          .filter(Boolean)
+          .join(' ')}
+      >
+        {label}
+      </label>
+      <TotalAmountField
+        mode={mode}
+        value={data[field]}
+        onChange={(val) => onChange(field, val)}
+      />
     </div>
   );
 
@@ -143,7 +176,11 @@ export default function ReceiptLayout({
           )}
         </div>
         <div className="receipt-shop-block">
-          <h1 className="receipt-shop-title">TIRE WHEELS &amp; AUTO REPAIR</h1>
+          <h1 className="receipt-shop-title">
+            TIRE WHEELS &amp;
+            <br />
+            AUTO REPAIR
+          </h1>
           <p className="receipt-shop-info">
             6150 Watt Ave., North Highlands, CA 95660 • Tel: (916) 571-5051
           </p>
@@ -236,40 +273,39 @@ export default function ReceiptLayout({
             />
           </Cell>
         </div>
-      </div>
-
-      <div className="receipt-payment-row">
-        <PaymentOption
-          mode={mode}
-          label="CASH"
-          field="payment_cash"
-          data={data}
-          onPaymentChange={onPaymentChange}
-        />
-        <PaymentOption
-          mode={mode}
-          label="CHARGE"
-          field="payment_charge"
-          data={data}
-          onPaymentChange={onPaymentChange}
-        />
-        <PaymentOption
-          mode={mode}
-          label="CHECK"
-          field="payment_check"
-          data={data}
-          onPaymentChange={onPaymentChange}
-        />
-        <PaymentOption
-          mode={mode}
-          label="FINANCE"
-          field="payment_finance"
-          data={data}
-          onPaymentChange={onPaymentChange}
-        />
-        <div className="receipt-mileage-cell">
-          <label>Mileage:</label>
-          <FieldInput mode={mode} value={data.mileage} onChange={handleField('mileage')} />
+        <div className="receipt-customer-row row-payment">
+          <PaymentOption
+            mode={mode}
+            label="CASH"
+            field="payment_cash"
+            data={data}
+            onPaymentChange={onPaymentChange}
+          />
+          <PaymentOption
+            mode={mode}
+            label="CHARGE"
+            field="payment_charge"
+            data={data}
+            onPaymentChange={onPaymentChange}
+          />
+          <PaymentOption
+            mode={mode}
+            label="CHECK"
+            field="payment_check"
+            data={data}
+            onPaymentChange={onPaymentChange}
+          />
+          <PaymentOption
+            mode={mode}
+            label="FINANCE"
+            field="payment_finance"
+            data={data}
+            onPaymentChange={onPaymentChange}
+          />
+          <div className="receipt-mileage-cell">
+            <label>Mileage:</label>
+            <FieldInput mode={mode} value={data.mileage} onChange={handleField('mileage')} />
+          </div>
         </div>
       </div>
 
@@ -438,7 +474,10 @@ export default function ReceiptLayout({
           </div>
         </div>
 
-        <div className="receipt-legal">{LEGAL_TEXT}</div>
+        <div className="receipt-legal">
+          <strong>{LEGAL_LEAD}</strong>
+          {LEGAL_BODY}
+        </div>
 
         <div className="receipt-initials-block">
           <div className="init-line">
@@ -473,11 +512,35 @@ export default function ReceiptLayout({
           {renderTotalRow('LABOR', 'labor')}
           {renderTotalRow('SUB TOTAL', 'subtotal')}
           {renderTotalRow('SALES TAX', 'sales_tax')}
-          {renderTotalRow('NEW TIRE FEE', 'new_tire_fee')}
-          {renderTotalRow('TIRE / OIL DISPOSAL', 'tire_oil_disposal')}
-          {renderTotalRow('TOTAL', 'total')}
+          {renderTotalRow(
+            <>
+              NEW
+              <br />
+              TIRE FEE
+            </>,
+            'new_tire_fee',
+            { stacked: true }
+          )}
+          {renderTotalRow(
+            <>
+              TIRE / OIL
+              <br />
+              DISPOSAL
+            </>,
+            'tire_oil_disposal',
+            { stacked: true }
+          )}
+          {renderTotalRow('TOTAL', 'total', { emphasis: true })}
           {renderTotalRow('DEPOSIT', 'deposit')}
-          {renderTotalRow('BALANCE DUE', 'balance_due')}
+          {renderTotalRow(
+            <>
+              BALANCE
+              <br />
+              DUE
+            </>,
+            'balance_due',
+            { stacked: true, emphasis: true }
+          )}
         </div>
       </div>
 

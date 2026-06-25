@@ -1,4 +1,12 @@
-/* Kings Tire receipt — screen + print */
+/* Kings Tire receipt — 1:1 match to physical form (screen + print) */
+
+:root {
+  --receipt-qty: 0.42in;
+  --receipt-amount: 1.12in;
+  --receipt-cents: 0.26in;
+  --receipt-total-label: 0.52in;
+  --receipt-totals: calc(var(--receipt-total-label) + var(--receipt-amount));
+}
 
 .app-nav {
   display: flex;
@@ -115,13 +123,6 @@
   .search-sections {
     grid-template-columns: 1fr;
   }
-}
-
-.success-msg {
-  color: #1b5e20;
-  margin: 0.5rem 0;
-  font-size: 0.9rem;
-  font-weight: 600;
 }
 
 .success-msg {
@@ -253,7 +254,7 @@
   font-style: italic;
 }
 
-/* Receipt container */
+/* ── Receipt container ── */
 .receipt {
   width: 8.5in;
   max-width: 100%;
@@ -261,11 +262,11 @@
   background: #fff;
   color: #000;
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 9pt;
-  line-height: 1.2;
+  font-size: 8.5pt;
+  line-height: 1.15;
   box-sizing: border-box;
   border: 1px solid #000;
-  padding: 0.12in 0.15in;
+  padding: 0.1in 0.12in 0.08in;
 }
 
 .receipt * {
@@ -275,11 +276,9 @@
 /* Header */
 .receipt-header {
   display: grid;
-  grid-template-columns: 0.9in 1fr auto;
-  gap: 0.08in;
+  grid-template-columns: 0.78in 1fr auto;
+  gap: 0.06in;
   align-items: start;
-  border-bottom: 1px solid #000;
-  padding-bottom: 0.06in;
   margin-bottom: 0.04in;
 }
 
@@ -289,37 +288,39 @@
 
 .receipt-logo img,
 .receipt-logo svg {
-  width: 0.85in;
+  width: 0.78in;
   height: auto;
   display: block;
+  margin: 0 auto;
 }
 
 .receipt-counter {
   display: block;
-  font-size: 7pt;
+  font-size: 6.5pt;
   font-weight: bold;
   color: #333;
-  margin-top: 0.02in;
+  margin-top: 0.01in;
 }
 
 .receipt-shop-block {
   text-align: center;
-  padding: 0 0.1in;
+  padding: 0 0.08in;
 }
 
 .receipt-shop-title {
-  font-size: 14pt;
+  font-size: 13.5pt;
   font-weight: bold;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
   text-align: center;
-  line-height: 1.1;
+  line-height: 1.05;
   margin: 0;
 }
 
 .receipt-shop-info {
   text-align: center;
-  font-size: 7.5pt;
-  margin: 0.02in 0 0;
+  font-size: 7pt;
+  margin: 0.015in 0 0;
+  line-height: 1.25;
 }
 
 .receipt-invoice-label {
@@ -328,21 +329,21 @@
 
 .receipt-invoice-label h2 {
   margin: 0;
-  font-size: 16pt;
+  font-size: 15pt;
   font-weight: bold;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
 }
 
 .receipt-ard-box {
   border: 2px solid #000;
-  padding: 0.08in 0.1in;
-  font-size: 11pt;
+  padding: 0.06in 0.08in;
+  font-size: 10pt;
   font-weight: bold;
-  margin-top: 0.06in;
-  min-width: 1.65in;
-  min-height: 0.38in;
+  margin-top: 0.04in;
+  min-width: 1.55in;
+  min-height: 0.34in;
   text-align: center;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -356,14 +357,13 @@
 .receipt-banner {
   text-align: center;
   font-weight: bold;
-  font-size: 8pt;
+  font-size: 7.5pt;
   border: 1px solid #000;
   border-bottom: none;
-  padding: 0.03in;
-  background: #f5f5f5;
+  padding: 0.025in;
 }
 
-/* Customer section — row-based grid matching paper proportions */
+/* Customer + payment grid (single box) */
 .receipt-customer-section {
   border: 1px solid #000;
   border-top: none;
@@ -379,28 +379,32 @@
 }
 
 .receipt-customer-row.row-1 {
-  grid-template-columns: 6.5fr 2fr 1.5fr;
+  grid-template-columns: 5fr 3fr 2fr;
 }
 
 .receipt-customer-row.row-2 {
-  grid-template-columns: 8.5fr 1.5fr;
+  grid-template-columns: 8fr 2fr;
 }
 
 .receipt-customer-row.row-3 {
-  grid-template-columns: 4.5fr 2fr 2fr 1.5fr;
+  grid-template-columns: 4fr 1.5fr 1.5fr 3fr;
 }
 
 .receipt-customer-row.row-4 {
-  grid-template-columns: 8.5fr 1.5fr;
+  grid-template-columns: 7fr 3fr;
+}
+
+.receipt-customer-row.row-payment {
+  grid-template-columns: repeat(4, 1fr) minmax(1.05in, auto);
 }
 
 .receipt-customer-row .cell {
   border-right: 1px solid #000;
-  padding: 0.02in 0.04in;
+  padding: 0.015in 0.04in;
   display: flex;
   align-items: baseline;
-  gap: 0.04in;
-  min-height: 0.22in;
+  gap: 0.03in;
+  min-height: 0.2in;
 }
 
 .receipt-customer-row .cell:last-child {
@@ -408,7 +412,7 @@
 }
 
 .receipt-customer-row label {
-  font-size: 7pt;
+  font-size: 6.5pt;
   font-weight: bold;
   white-space: nowrap;
   flex-shrink: 0;
@@ -417,7 +421,7 @@
 .receipt-customer-row .field-value {
   flex: 1;
   min-width: 0;
-  font-size: 9pt;
+  font-size: 8.5pt;
 }
 
 .receipt-customer-row input,
@@ -427,7 +431,7 @@
   border: none;
   border-bottom: 1px solid #ccc;
   background: transparent;
-  font-size: 9pt;
+  font-size: 8.5pt;
   font-family: inherit;
   padding: 0;
   margin: 0;
@@ -441,12 +445,12 @@
 
 .year-make-fields {
   display: flex;
-  gap: 0.06in;
+  gap: 0.04in;
   flex: 1;
 }
 
 .year-make-fields .year-input {
-  width: 0.5in;
+  width: 0.45in;
   flex: none;
 }
 
@@ -454,23 +458,16 @@
   flex: 1;
 }
 
-/* Payment row + mileage */
-.receipt-payment-row {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr) minmax(1.1in, auto);
-  border: 1px solid #000;
-  border-top: none;
-}
-
-.receipt-payment-row .payment-option {
+/* Payment row (inside customer section) */
+.receipt-customer-row.row-payment .payment-option {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.06in;
-  padding: 0.04in;
+  gap: 0.05in;
+  padding: 0.03in;
   border-right: 1px solid #000;
   font-weight: bold;
-  font-size: 8pt;
+  font-size: 7.5pt;
   cursor: pointer;
   margin: 0;
 }
@@ -478,24 +475,23 @@
 .receipt-mileage-cell {
   display: flex;
   align-items: baseline;
-  gap: 0.04in;
-  padding: 0.04in 0.06in;
-  font-size: 8pt;
-  border-left: 1px solid #000;
+  gap: 0.03in;
+  padding: 0.03in 0.05in;
+  font-size: 7.5pt;
 }
 
 .receipt-mileage-cell label {
   font-weight: bold;
-  font-size: 7pt;
+  font-size: 6.5pt;
   white-space: nowrap;
 }
 
 .receipt-mileage-cell input {
   flex: 1;
-  min-width: 0.5in;
+  min-width: 0.45in;
   border: none;
   border-bottom: 1px solid #ccc;
-  font-size: 9pt;
+  font-size: 8.5pt;
   font-family: inherit;
   padding: 0;
   background: transparent;
@@ -508,38 +504,42 @@
 
 .receipt-mileage-cell .field-value {
   flex: 1;
-  font-size: 9pt;
+  font-size: 8.5pt;
 }
 
-/* Line items table */
+/* Line items table — fixed columns align with totals */
 .receipt-items-table {
   width: 100%;
   border-collapse: collapse;
   border: 1px solid #000;
   border-top: none;
+  table-layout: fixed;
 }
 
 .receipt-items-table th {
   border: 1px solid #000;
-  font-size: 7.5pt;
+  font-size: 7pt;
   font-weight: bold;
-  padding: 0.03in 0.04in;
-  background: #f5f5f5;
+  padding: 0.025in 0.04in;
 }
 
 .receipt-items-table th.col-qty {
-  width: 0.45in;
+  width: var(--receipt-qty);
 }
 
 .receipt-items-table th.col-amount {
-  width: 1.1in;
+  width: var(--receipt-amount);
 }
 
 .receipt-items-table td {
   border: 1px solid #000;
   padding: 0;
-  height: 0.19in;
+  height: 0.175in;
   vertical-align: middle;
+}
+
+.receipt-items-table td.cell-amount {
+  border-left: 1px dashed #666;
 }
 
 .receipt-items-table input {
@@ -547,9 +547,9 @@
   height: 100%;
   border: none;
   background: transparent;
-  font-size: 8.5pt;
+  font-size: 8pt;
   font-family: inherit;
-  padding: 0 0.04in;
+  padding: 0 0.03in;
 }
 
 .receipt-items-table input:focus {
@@ -559,8 +559,8 @@
 
 .receipt-items-table .cell-amount {
   text-align: right;
-  padding-right: 0.06in;
-  font-size: 8.5pt;
+  padding: 0;
+  font-size: 8pt;
 }
 
 .amount-split {
@@ -573,30 +573,36 @@
 .amount-dollars {
   flex: 1;
   text-align: right;
-  padding-right: 0.04in;
+  padding-right: 0.03in;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .amount-cents-divider {
   border-left: 1px dashed #666;
-  width: 0.35in;
+  width: var(--receipt-cents);
+  flex-shrink: 0;
   text-align: left;
-  padding-left: 0.03in;
+  padding-left: 0.025in;
   font-size: 7pt;
+  display: flex;
+  align-items: center;
 }
 
 .receipt-warranty-note {
   border: 1px solid #000;
   border-top: none;
   text-align: center;
-  font-size: 7pt;
+  font-size: 6.5pt;
   font-weight: bold;
-  padding: 0.03in;
+  padding: 0.025in;
 }
 
-/* Bottom section: specials + totals */
+/* Bottom: left specials + right totals (values align under AMOUNT column) */
 .receipt-bottom {
   display: grid;
-  grid-template-columns: 1fr 1.35in;
+  grid-template-columns: 1fr var(--receipt-totals);
   border: 1px solid #000;
   border-top: none;
 }
@@ -608,13 +614,13 @@
 }
 
 .receipt-specials {
-  padding: 0.04in;
-  font-size: 7pt;
+  padding: 0.03in 0.04in;
+  font-size: 6.5pt;
 }
 
 .receipt-specials h3 {
-  margin: 0 0 0.04in;
-  font-size: 7.5pt;
+  margin: 0 0 0.03in;
+  font-size: 7pt;
   text-align: center;
   font-weight: bold;
 }
@@ -622,27 +628,29 @@
 .special-row {
   display: flex;
   align-items: baseline;
-  gap: 0.04in;
-  margin-bottom: 0.02in;
+  gap: 0.03in;
+  margin-bottom: 0.015in;
   flex-wrap: wrap;
 }
 
 .special-row input[type='checkbox'] {
   flex-shrink: 0;
   margin: 0;
+  width: 0.1in;
+  height: 0.1in;
 }
 
 .special-row .special-label {
   flex: 1;
-  font-size: 6.5pt;
-  line-height: 1.15;
+  font-size: 6pt;
+  line-height: 1.12;
 }
 
 .special-row input[type='text'] {
-  width: 0.5in;
+  width: 0.45in;
   border: none;
   border-bottom: 1px solid #000;
-  font-size: 7pt;
+  font-size: 6.5pt;
   padding: 0;
   background: transparent;
 }
@@ -650,17 +658,18 @@
 .special-grid-3 {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 0.02in;
-  margin: 0.03in 0;
+  gap: 0.01in;
+  margin: 0.02in 0;
 }
 
 .special-grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.02in;
-  margin: 0.02in 0;
+  gap: 0.01in;
+  margin: 0.015in 0;
 }
 
+/* Totals — labels + values fit inside AMOUNT column width */
 .receipt-totals {
   display: flex;
   flex-direction: column;
@@ -668,15 +677,12 @@
 
 .total-row {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: var(--receipt-total-label) var(--receipt-amount);
   border-bottom: 1px solid #000;
-  min-height: 0.2in;
+  height: 0.21in;
+  min-height: 0.21in;
+  max-height: 0.21in;
   align-items: stretch;
-  flex: 1;
-}
-
-.total-row:first-child {
-  border-top: none;
 }
 
 .total-row:last-child {
@@ -685,83 +691,116 @@
 
 .total-row label {
   font-weight: bold;
-  font-size: 7pt;
-  padding: 0.02in 0.04in;
+  font-size: 6.5pt;
+  line-height: 1.05;
+  padding: 0 0.03in;
   border-right: 1px solid #000;
   display: flex;
   align-items: center;
+  justify-content: flex-start;
+  white-space: normal;
+  overflow: visible;
+  text-transform: uppercase;
 }
 
-.total-row .total-value {
-  text-align: right;
+.total-row label.total-label-stacked {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  line-height: 1;
+  font-size: 6pt;
+  padding: 0.01in 0.03in;
+}
+
+.total-row label.total-label-emphasis {
+  font-size: 7pt;
+}
+
+.total-amount-cell {
   padding: 0;
-  font-size: 8.5pt;
-  min-width: 0.95in;
-  border-right: 1px solid #000;
+  overflow: hidden;
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
 }
 
-.total-row .total-value .amount-split {
-  height: 100%;
-  min-height: 0.2in;
-}
-
-.total-row .total-value .amount-dollars {
-  padding: 0.02in 0.04in 0.02in 0.02in;
-}
-
-.total-row .total-value .amount-cents-divider {
-  width: 0.32in;
-  padding: 0.02in 0.03in;
-  font-size: 8pt;
-  border-left: 1px dashed #666;
-}
-
-.total-row input.total-input {
+.total-amount-cell .amount-split {
   width: 100%;
-  min-width: 0.95in;
-  border: none;
-  border-right: 1px solid #000;
+  height: 100%;
+  min-height: 0;
+}
+
+.total-amount-cell .amount-dollars,
+.total-amount-cell .amount-dollars-input {
+  flex: 1;
+  min-width: 0;
   text-align: right;
-  font-size: 8.5pt;
-  padding: 0.02in 0.06in;
+  padding: 0 0.025in;
+  font-size: 7.5pt;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.total-amount-cell .amount-dollars-input {
+  width: 100%;
+  height: 100%;
+  border: none;
   background: transparent;
   font-family: inherit;
+  outline: none;
 }
 
-.total-row input.total-input:focus {
-  outline: 1px solid #333;
-  outline-offset: -1px;
+.total-amount-cell .amount-dollars-input:focus {
+  background: rgba(0, 0, 0, 0.03);
 }
 
-/* Legal (inside bottom-left column) */
+.total-amount-cell .amount-cents-divider {
+  width: var(--receipt-cents);
+}
+
+.total-amount-cell .amount-cents-readonly {
+  color: #333;
+  pointer-events: none;
+}
+
+/* Legal */
 .receipt-legal {
   border-top: 1px solid #000;
-  padding: 0.04in;
-  font-size: 5.5pt;
-  line-height: 1.22;
+  padding: 0.03in 0.04in;
+  font-size: 5pt;
+  line-height: 1.2;
   text-align: justify;
+}
+
+.receipt-legal strong {
+  font-size: 5.5pt;
+  display: block;
+  margin-bottom: 0.02in;
+  line-height: 1.15;
 }
 
 .receipt-initials-block {
   border-top: 1px solid #000;
-  padding: 0.04in 0.06in;
-  font-size: 6.5pt;
+  padding: 0.03in 0.05in;
+  font-size: 6pt;
   margin-top: auto;
 }
 
 .receipt-initials-block .init-line {
   display: flex;
   align-items: baseline;
-  gap: 0.04in;
-  margin-bottom: 0.03in;
+  gap: 0.03in;
+  margin-bottom: 0.025in;
+  line-height: 1.15;
 }
 
 .receipt-initials-block input {
   flex: 1;
   border: none;
   border-bottom: 1px solid #000;
-  font-size: 7pt;
-  max-width: 0.6in;
+  font-size: 6.5pt;
+  max-width: 0.55in;
   background: transparent;
 }
 
@@ -770,23 +809,25 @@
   border-top: none;
   text-align: center;
   font-weight: bold;
-  font-size: 7pt;
-  padding: 0.04in;
+  font-size: 6.5pt;
+  padding: 0.03in;
 }
 
 .receipt-footer {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr auto;
   border: 1px solid #000;
   border-top: none;
-  font-size: 6.5pt;
-  padding: 0.04in;
+  font-size: 6pt;
+  padding: 0.03in 0.04in 0.04in;
+  gap: 0.1in;
 }
 
 .receipt-footer-note {
   text-align: right;
-  padding-top: 0.2in;
   align-self: end;
+  font-size: 6pt;
+  white-space: nowrap;
 }
 
 .receipt-footer-signature {
@@ -794,16 +835,16 @@
 }
 
 .receipt-footer-signature .sig-label {
-  font-size: 7pt;
+  font-size: 6.5pt;
   font-weight: bold;
   display: block;
-  margin-bottom: 0.04in;
+  margin-bottom: 0.02in;
 }
 
 .receipt-footer .sig-line {
   border-bottom: 2px solid #000;
-  margin-top: 0.04in;
-  min-height: 0.45in;
+  margin-top: 0.02in;
+  min-height: 0.38in;
   width: 100%;
 }
 
@@ -822,19 +863,20 @@
 
 .view-checkbox {
   display: inline-block;
-  width: 0.12in;
-  height: 0.12in;
+  width: 0.11in;
+  height: 0.11in;
   border: 1px solid #000;
   text-align: center;
-  line-height: 0.12in;
-  font-size: 8pt;
-  margin-right: 0.03in;
+  line-height: 0.11in;
+  font-size: 7pt;
+  margin-right: 0.02in;
   vertical-align: middle;
+  flex-shrink: 0;
 }
 
 .view-checkbox.checked::after {
   content: '✓';
-  font-size: 7pt;
+  font-size: 6pt;
 }
 
 /* Print */
@@ -863,15 +905,17 @@
   .receipt-customer-row input,
   .receipt-customer-row .date-input,
   .receipt-items-table input,
-  .total-row input,
+  .total-amount-cell .amount-dollars-input,
   .special-row input[type='text'],
-  .receipt-initials-block input {
+  .receipt-initials-block input,
+  .receipt-mileage-cell input {
     border: none !important;
     border-bottom: none !important;
     outline: none !important;
   }
 
-  .receipt-payment-row input[type='checkbox'] {
+  .receipt-customer-row.row-payment input[type='checkbox'],
+  .special-row input[type='checkbox'] {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
@@ -881,7 +925,7 @@
   }
 
   .receipt-footer .sig-line {
-    min-height: 0.5in;
+    min-height: 0.42in;
   }
 }
 

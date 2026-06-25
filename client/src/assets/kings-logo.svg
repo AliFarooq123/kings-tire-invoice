@@ -1,13 +1,27 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130 112" width="130" height="112">
-  <!-- Crown body: 3 points -->
-  <path fill="#000" d="M14 66 L14 50 L30 28 L47 48 L65 20 L83 48 L100 28 L116 50 L116 66 Z"/>
-  <!-- Ball finials on each of the 3 points -->
-  <circle cx="30" cy="26" r="6" fill="#000"/>
-  <circle cx="65" cy="18" r="6.5" fill="#000"/>
-  <circle cx="100" cy="26" r="6" fill="#000"/>
-  <!-- King's banner: black rounded rectangle -->
-  <rect x="8" y="70" width="114" height="34" rx="17" ry="17" fill="#000"/>
-  <text x="65" y="94" text-anchor="middle" fill="#fff"
-        font-family="Georgia, 'Times New Roman', serif" font-size="22"
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 88 72" width="88" height="72">
+  <!-- 5-point solid black crown -->
+  <path fill="#000" d="
+    M6 32
+    L6 24 L14 17 L22 22
+    L30 9 L44 18
+    L58 9 L66 22 L74 17 L82 24
+    L82 32
+    Z"/>
+  <circle cx="14" cy="15" r="3" fill="#000"/>
+  <circle cx="30" cy="7" r="2.8" fill="#000"/>
+  <circle cx="44" cy="5" r="3.2" fill="#000"/>
+  <circle cx="58" cy="7" r="2.8" fill="#000"/>
+  <circle cx="74" cy="15" r="3" fill="#000"/>
+  <!-- Curved banner at crown base -->
+  <path fill="#000" d="
+    M4 34
+    C4 34 8 38 44 38
+    C80 38 84 34 84 34
+    L84 50
+    C84 50 80 54 44 54
+    C8 54 4 50 4 50
+    Z"/>
+  <text x="44" y="47" text-anchor="middle" fill="#fff"
+        font-family="Georgia, 'Times New Roman', serif" font-size="13"
         font-weight="bold" font-style="italic">King's</text>
 </svg>
