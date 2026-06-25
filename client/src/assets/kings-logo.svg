@@ -1,42 +1,45 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 100" width="120" height="100">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 140">
   <!--
-    5-point solid black crown.
-    Ball finials at all 5 peaks and 2 bottom corners.
-    "King's" in white italic bold inside the lower crown body.
+    Solid dark crown matching the Kings logo:
+    - 5 peaks with smooth bezier curves between them
+    - Ball finials on all 5 peaks + 2 bottom corners
+    - White "King's" bold italic text inside the lower crown body
   -->
 
-  <!-- Crown silhouette -->
-  <path fill="#000" stroke="none" d="
-    M 8  82
-    L 8  50
-    L 24 28
-    L 40 46
-    L 60 10
-    L 80 46
-    L 96 28
-    L 112 50
-    L 112 82
+  <!-- Crown silhouette with smooth curved valleys -->
+  <path fill="#1a1a1a" d="
+    M 8 128
+    C 8 115 16 96 28 66
+    C 34 74 42 88 50 96
+    C 56 84 62 52 70 36
+    C 76 50 84 70 92 80
+    C 95 70 98 44 100 18
+    C 102 44 105 70 108 80
+    C 116 70 124 50 130 36
+    C 138 52 144 84 150 96
+    C 158 88 166 74 172 66
+    C 184 96 192 115 192 128
     Z
   "/>
 
   <!-- Ball tips: 5 peaks -->
-  <circle cx="24"  cy="26" r="5"   fill="#000"/>
-  <circle cx="40"  cy="44" r="4.5" fill="#000"/>
-  <circle cx="60"  cy="8"  r="6"   fill="#000"/>
-  <circle cx="80"  cy="44" r="4.5" fill="#000"/>
-  <circle cx="96"  cy="26" r="5"   fill="#000"/>
+  <circle cx="28"  cy="60"  r="8"   fill="#1a1a1a"/>
+  <circle cx="70"  cy="30"  r="8"   fill="#1a1a1a"/>
+  <circle cx="100" cy="12"  r="8.5" fill="#1a1a1a"/>
+  <circle cx="130" cy="30"  r="8"   fill="#1a1a1a"/>
+  <circle cx="172" cy="60"  r="8"   fill="#1a1a1a"/>
 
   <!-- Ball tips: 2 bottom corners -->
-  <circle cx="8"   cy="82" r="5"   fill="#000"/>
-  <circle cx="112" cy="82" r="5"   fill="#000"/>
+  <circle cx="8"   cy="128" r="7.5" fill="#1a1a1a"/>
+  <circle cx="192" cy="128" r="7.5" fill="#1a1a1a"/>
 
-  <!-- "King's" text centered in the lower body of the crown -->
+  <!-- "King's" white bold italic text in the lower crown body -->
   <text
-    x="60" y="74"
+    x="100" y="118"
     text-anchor="middle"
     fill="#fff"
     font-family="Arial Black, Arial, Helvetica, sans-serif"
-    font-size="22"
+    font-size="38"
     font-weight="900"
     font-style="italic"
   >King's</text>

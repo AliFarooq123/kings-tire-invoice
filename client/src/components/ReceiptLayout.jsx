@@ -96,30 +96,25 @@ function AmountDisplay({ value }) {
 }
 
 function TotalAmountField({ mode, value, onChange }) {
-  const { cents } = splitAmount(value || 0);
-  const centsDisplay =
-    value != null && value !== '' ? cents : '';
-
   if (mode === 'view') {
+    // View mode: show plain amount text, right-aligned — no cents split
     return (
       <div className="total-amount-cell">
-        <AmountDisplay value={value} />
+        <span className="total-amount-view">{value != null && value !== '' ? value : ''}</span>
       </div>
     );
   }
 
+  // Edit mode: one plain full-width input — no split, no dashed divider, no duplication
   return (
     <div className="total-amount-cell">
-      <div className="amount-split">
-        <input
-          className="amount-dollars-input"
-          type="text"
-          inputMode="decimal"
-          value={value ?? ''}
-          onChange={(e) => onChange(e.target.value)}
-        />
-        <span className="amount-cents-divider amount-cents-readonly">{centsDisplay}</span>
-      </div>
+      <input
+        className="total-amount-input"
+        type="text"
+        inputMode="decimal"
+        value={value ?? ''}
+        onChange={(e) => onChange(e.target.value)}
+      />
     </div>
   );
 }

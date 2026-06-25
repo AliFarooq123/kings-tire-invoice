@@ -729,60 +729,37 @@
   font-size: 7.5pt;
 }
 
-/* Value cell — stretches to right edge of .receipt-bottom */
+/* Value cell — plain, full-width, no cents split, no dashed divider */
 .total-amount-cell {
-  padding: 0;
-  display: flex;
-  align-items: stretch;
-  width: 100%;
-  min-width: 0;
-}
-
-.total-amount-cell .amount-split {
-  width: 100%;
-  height: 100%;
-}
-
-.total-amount-cell .amount-dollars,
-.total-amount-cell .amount-dollars-input {
-  flex: 1;
-  min-width: 0;
-  text-align: right;
-  padding: 0 0.03in;
-  font-size: 8pt;
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  width: 100%;
+  min-width: 0;
+  padding: 0 0.05in;
 }
 
-.total-amount-cell .amount-dollars-input {
+/* View mode: right-aligned plain text */
+.total-amount-view {
+  font-size: 8pt;
+  text-align: right;
+}
+
+/* Edit mode: plain single input, full width, right-aligned */
+.total-amount-input {
   width: 100%;
   height: 100%;
   border: none;
   background: transparent;
   font-family: inherit;
+  font-size: 8pt;
+  text-align: right;
+  padding: 0;
   outline: none;
 }
 
-.total-amount-cell .amount-dollars-input:focus {
-  background: rgba(0,0,0,.03);
-}
-
-/* dashed cents divider in totals — full-height so it reaches the bottom border */
-.total-amount-cell .amount-cents-divider {
-  width: var(--receipt-cents);
-  flex-shrink: 0;
-  height: 100%;
-  border-left: 1.5px dashed #555;
-  display: flex;
-  align-items: center;
-  padding-left: 0.025in;
-  font-size: 7pt;
-}
-
-.total-amount-cell .amount-cents-readonly {
-  color: #333;
-  pointer-events: none;
+.total-amount-input:focus {
+  background: rgba(0, 0, 0, 0.03);
 }
 
 /* ── No-returns bar ── */
